@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Orçamento Simples</title>
+    <!-- Link para o arquivo manifest.json para PWA -->
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5; /* Fundo mais suave */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 16px; /* Cantos mais arredondados */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); /* Sombra mais suave */
+            max-width: 800px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px; /* Ajuste a margem para o novo campo */
+            font-size: 1.8em;
+            font-weight: 600; /* Um pouco mais leve */
+        }
+        .company-info {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .company-info label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1em;
+            color: #555;
+            font-weight: bold;
+        }
+        .company-info input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            font-size: 1em;
+            box-sizing: border-box;
+            height: 45px;
+        }
+        .logo-input-group {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        .logo-display-area {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px dashed #ccc;
+            border-radius: 8px;
+            min-height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f9f9f9;
+        }
+        .logo-display-area img {
+            max-width: 100%;
+            max-height: 80px; /* Limita a altura do logo para não distorcer o layout */
+            height: auto;
+            border-radius: 8px;
+            display: none; /* Esconde a imagem por padrão até que um URL seja válido */
+        }
+        .product-item {
+            display: flex;
+            flex-wrap: nowrap; /* Impede que os itens quebrem a linha */
+            align-items: flex-end; /* Alinha os itens na parte inferior */
+            margin-bottom: 15px;
+            gap: 5px; /* Espaçamento entre os itens bem menor */
+            padding: 12px; /* Um pouco mais de padding */
+            border: 1px solid #e8e8e8; /* Borda mais clara */
+            border-radius: 10px; /* Cantos mais arredondados */
+            background-color: #fdfdfd; /* Fundo mais claro */
+            position: relative;
+            overflow-x: hidden; /* Remove explicitamente o scroll horizontal */
+        }
+        .product-item input[type="text"],
+        .product-item input[type="number"] {
+            padding: 10px;
+            border: 1px solid #dcdcdc; /* Borda mais clara */
+            border-radius: 8px; /* Cantos mais arredondados */
+            font-size: 0.95em;
+            box-sizing: border-box;
+            height: 40px;
+        }
+        .product-item .product-description {
+            flex: 1; /* Permite crescer e ocupar o espaço restante */
+            min-width: 150px; /* Garante largura mínima para a descrição */
+        }
+        .product-item .total-display {
+            flex: 0 0 60px; /* Largura base ajustada para ser menor */
+            padding: 10px 5px; /* Reduz padding horizontal */
+            background-color: #f2f2f2; /* Fundo mais suave */
+            border: 1px solid #d0d0d0; /* Borda mais suave */
+            border-radius: 8px; /* Cantos mais arredondados */
+            text-align: right;
+            font-weight: bold;
+            color: #555;
+            min-width: 50px; /* Garante que não fique muito pequeno */
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .product-item label {
+            font-size: 0.75em; /* Reduzindo um pouco o tamanho da fonte da label */
+            color: #6a6a6a; /* Cor de texto um pouco mais suave */
+            margin-bottom: 3px; /* Reduzindo a margem inferior */
+            width: 100%;
+            display: block;
+            text-align: center; /* Centraliza a label sobre o input */
+        }
+        .product-item div.input-group {
+            display: flex;
+            flex-direction: column;
+            flex: 0 0 60px; /* Largura base para Qtd, Valor, Acréscimo (45px) */
+            align-items: center; /* Centraliza o input dentro do group */
+        }
+        .product-item input[type="number"] {
+            width: 100%; /* Faz o input preencher a largura do seu input-group */
+            padding: 5px 3px; /* Reduzindo o padding para caber mais números */
+            text-align: center; /* Centraliza o texto do número */
+        }
+
+        .delete-product {
+            background-color: #ff6b6b; /* Vermelho mais suave */
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Sombra mais suave */
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .delete-product:hover {
+            background-color: #ff4757; /* Vermelho um pouco mais forte no hover */
+            transform: scale(1.05);
+        }
+
+        .add-product {
+            background-color: #3cb371; /* Verde mais suave */
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            display: block;
+            width: 100%;
+            margin: 25px 0;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2); /* Sombra sutil */
+        }
+        .add-product:hover {
+            background-color: #2e8b57; /* Verde mais forte no hover */
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+        }
+        .delivery-section, .discount-section, .pix-info, .credit-card-info {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #fcfcfc; /* Fundo mais claro */
+            border: 1px solid #e8e8e8; /* Borda mais clara */
+            border-radius: 12px; /* Cantos mais arredondados */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Sombra mais suave */
+        }
+        .delivery-section label, .delivery-section input,
+        .discount-section label, .discount-section input,
+        .pix-info label, .pix-info input, .pix-info select {
+            display: block;
+            margin-bottom: 15px;
+        }
+        .delivery-section input,
+        .discount-section input,
+        .pix-info input, .pix-info select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            margin-top: 5px;
+            font-size: 0.95em;
+            box-sizing: border-box;
+        }
+        .summary {
+            margin-top: 30px;
+            border-top: 2px solid #e0e0e0; /* Borda mais clara */
+            padding-top: 20px;
+        }
+        .summary div {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 1.15em;
+        }
+        .summary div strong {
+            color: #333;
+        }
+        .total-pay strong {
+            font-size: 1.5em;
+            color: #007BFF;
+            font-weight: bold;
+        }
+        .credit-card-info p {
+            font-size: 0.9em;
+            color: #888; /* Cor de texto mais suave */
+            text-align: center;
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        .print-button, .save-button, .load-button {
+            flex: 1;
+            background-color: #007BFF;
+            color: white;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            box-sizing: border-box;
+            text-align: center;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            min-width: 120px;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2); /* Sombra sutil */
+        }
+        .print-button:hover, .save-button:hover, .load-button:hover {
+            background-color: #0056b3;
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+        }
+        .save-button {
+            background-color: #ffa040; /* Laranja mais suave */
+            box-shadow: 0 4px 10px rgba(255, 152, 0, 0.2);
+        }
+        .save-button:hover {
+            background-color: #e68900;
+            box-shadow: 0 6px 15px rgba(255, 152, 0, 0.3);
+        }
+        .load-button {
+            background-color: #8a63d2; /* Roxo mais suave */
+            box-shadow: 0 4px 10px rgba(103, 58, 183, 0.2);
+        }
+        .load-button:hover {
+            background-color: #724cb8;
+            box-shadow: 0 6px 15px rgba(103, 58, 183, 0.3);
+        }
+
+        /* Estilos para impressão */
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: #fff;
+                font-size: 12pt;
+            }
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+                padding: 10px;
+                max-width: none;
+                margin: 0;
+            }
+            h1 {
+                font-size: 1.5em;
+                margin-bottom: 20px;
+            }
+            .company-info {
+                text-align: center;
+                margin-bottom: 15px;
+            }
+            .company-info label,
+            .company-info input {
+                display: none !important; /* Oculta a label e o input na impressão */
+            }
+            .company-info .print-only-company-name {
+                display: block !important;
+                font-size: 1.2em;
+                font-weight: bold;
+                margin-bottom: 10px;
+            }
+            .product-item input[type="number"],
+            .product-item .value-input,
+            .product-item .percentage-input,
+            .add-product,
+            .summary .subtotal,
+            .summary .additional-value,
+            .pix-info .online-only,
+            .delivery-section .online-only,
+            .discount-section .online-only,
+            .button-group,
+            .credit-card-info,
+            .delete-product,
+            .product-item label, /* Oculta todas as labels dos itens de produto */
+            .product-item div.input-group /* Oculta os grupos de input (Qtd, Valor, Acr.) */
+            {
+                display: none !important;
+            }
+            .product-item {
+                display: block; /* Volta para bloco para que a descrição ocupe a linha toda */
+                margin-bottom: 8px;
+                padding: 0;
+                border: none;
+                background: none;
+            }
+            .product-item .product-description {
+                width: 100%; /* Ocupa a largura total na impressão */
+                border: none;
+                background: none;
+                padding: 0;
+                font-size: 1em;
+                display: block !important; /* Garante que a descrição seja visível */
+            }
+            .product-item .total-display {
+                display: none !important; /* Oculta o total-display original na impressão */
+            }
+            .product-item .quantity-display { /* Este não existe no HTML, mas é um exemplo se fosse necessário */
+                display: none !important;
+            }
+            .summary {
+                border-top: 1px dashed #ccc;
+                padding-top: 10px;
+                margin-top: 10px;
+            }
+            .summary div {
+                font-size: 1em;
+                padding: 3px 0;
+            }
+             .total-pay {
+                font-weight: bold;
+                margin-top: 15px;
+                border-top: 1px solid #000;
+                padding-top: 10px;
+            }
+            .pix-info, .delivery-section, .discount-section {
+                display: block !important;
+                background-color: #fff;
+                border: none;
+                padding: 0;
+                margin-top: 15px;
+            }
+             .pix-info label, .delivery-section label, .discount-section label {
+                display: inline;
+                font-weight: bold;
+                margin-right: 5px;
+            }
+            .pix-info .print-only, .delivery-section .print-only, .discount-section .print-only {
+                display: block !important;
+            }
+
+            /* Força a exibição dos novos totais na impressão */
+            .summary #gross-total-print-info,
+            .summary #discount-amount-print-info {
+                display: flex !important;
+            }
+        }
+
+        /* Responsividade para telas menores */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+            }
+            .product-item {
+                flex-direction: column; /* Em telas muito pequenas, volta a empilhar */
+                align-items: stretch;
+            }
+            .product-item input[type="text"],
+            .product-item input[type="number"],
+            .product-item .total-display {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .product-item div.input-group {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .button-group {
+                flex-direction: column;
+            }
+            .print-button, .save-button, .load-button {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>FORMULÁRIO DE ORÇAMENTO SIMPLES</h1>
+
+        <div class="company-info">
+            <label for="company-name">Nome da Empresa / CNPJ:</label>
+            <input type="text" id="company-name" placeholder="Digite o nome ou CNPJ da empresa">
+            <div class="print-only-company-name" style="display:none;"></div>
+        </div>
+
+        <div class="logo-input-group">
+            <label for="logo-url">URL do Logo da Empresa:</label>
+            <input type="text" id="logo-url" placeholder="Cole aqui o endereço da imagem do seu logo (ex: https://seusite.com/logo.png)">
+            <div class="logo-display-area">
+                <img id="company-logo" src="" alt="Logo da Empresa" onerror="this.style.display='none';">
+            </div>
+        </div>
+
+        <div id="product-list">
+            <div class="product-item">
+                <input type="text" class="product-description" placeholder="Descrição do Produto">
+                <div class="input-group">
+                    <label>Qtd:</label>
+                    <input type="number" class="quantity-input" value="1" min="1">
+                </div>
+                <div class="input-group">
+                    <label>Valor (R$):</label>
+                    <input type="number" class="value-input" placeholder="0.00" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>acr. (%):</label>
+                    <input type="number" class="percentage-input" value="20" min="0">
+                </div>
+                <div class="total-display">R$ 0,00</div>
+                <button class="delete-product">X</button>
+            </div>
+        </div>
+
+        <button class="add-product" onclick="addProduct()">Adicionar Produto</button>
+
+        <div class="delivery-section">
+            <h3 class="online-only">Informações de Entrega:</h3>
+            <label class="online-only" for="distance">Distância (KM):</label>
+            <input class="online-only" type="number" id="distance" placeholder="0" step="0.1">
+
+            <label class="online-only" for="price-per-km">Valor por KM (R$):</label>
+            <input class="online-only" type="number" id="price-per-km" placeholder="0.00" step="0.01">
+
+            <div class="print-only" id="delivery-print-info" style="display:none;">
+                <p><strong>Valor de Entrega:</strong> R$ <span class="delivery-cost-display">0,00</span></p>
+            </div>
+        </div>
+
+        <div class="discount-section">
+            <h3 class="online-only">Desconto (Pix):</h3>
+            <label class="online-only" for="pix-discount-percentage">Desconto no Pix (%):</label>
+            <input class="online-only" type="number" id="pix-discount-percentage" placeholder="0" min="0" max="100" step="0.1">
+
+            <div class="print-only" id="discount-print-info" style="display:none;">
+                <p><strong>Desconto Pix:</strong> <span class="discount-percentage-display">0%</span></p>
+            </div>
+        </div>
+
+        <div class="summary">
+            <!-- Online view elements (hidden in print) -->
+            <div class="subtotal online-only">
+                <span>Subtotal (Itens):</span>
+                <strong>R$ <span id="subtotal">0,00</span></strong>
+            </div>
+            <div class="additional-value online-only">
+                <span>acr. Total:</span>
+                <strong>R$ <span id="additional-value">0,00</span></strong>
+            </div>
+
+            <!-- Novas linhas para exibir Valor de Entrega e Valor do Desconto online -->
+            <div class="delivery-cost-summary online-only">
+                <span>Valor de Entrega:</span>
+                <strong>R$ <span id="delivery-cost-summary-display">0,00</span></strong>
+            </div>
+            <div class="discount-amount-summary online-only">
+                <span>Valor do Desconto:</span>
+                <strong>R$ <span id="discount-amount-summary-display">0,00</span></strong>
+            </div>
+
+            <!-- Print view elements (hidden online) -->
+            <div class="print-only" id="gross-total-print-info">
+                <span>Total Bruto (c/ acréscimo e entrega):</span>
+                <strong>R$ <span class="gross-total-display">0,00</span></strong>
+            </div>
+            <div class="print-only" id="discount-amount-print-info">
+                <span>Valor do Desconto:</span>
+                <strong>R$ <span class="discount-amount-display">0,00</span></strong>
+            </div>
+
+            <div class="total-pay">
+                <span>TOTAL A PAGAR:</span>
+                <strong>R$ <span id="total-pay">0,00</span></strong>
+            </div>
+        </div>
+
+        <div class="pix-info">
+            <h3 class="online-only">Informações para Pagamento via Pix:</h3>
+            <label class="online-only" for="pix-key-type">Tipo de Chave Pix:</label>
+            <select class="online-only" id="pix-key-type">
+                <option value="">Selecione o tipo</option>
+                <option value="cpf">CPF</option>
+                <option value="cnpj">CNPJ</option>
+                <option value="email">E-mail</option>
+                <option value="phone">Telefone</option>
+                <option value="random">Chave Aleatória</option>
+            </select>
+
+            <label class="online-only" for="pix-key">Chave Pix:</label>
+            <input class="online-only" type="text" id="pix-key" placeholder="Digite a chave Pix">
+
+            <label class="online-only" for="pix-description">Descrição para Identificação:</label>
+            <input class="online-only" type="text" id="pix-description" placeholder="Ex: Nome da Empresa, Recebedor">
+
+            <div class="print-only" id="pix-print-info">
+                <p><strong>Informações para Pagamento via Pix:</strong></p>
+                <!-- Removido o span do tipo da chave Pix para impressão -->
+                <p>Chave Pix: <span class="pix-key-display"></span></p>
+                <p>Identificação: <span class="pix-description-display"></span></p>
+            </div>
+        </div>
+
+        <div class="credit-card-info">
+            <p>Pode ser pago com cartão de crédito com juros (a consultar condições).</p>
+        </div>
+
+        <div class="button-group">
+            <button class="print-button" onclick="printForm()">Imprimir Orçamento</button>
+            <button class="save-button" onclick="saveForm()">Salvar Orçamento</button>
+            <button class="load-button" onclick="loadForm()">Carregar Orçamento</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Adiciona listeners para os campos da primeira linha e os campos de entrega/desconto
+            attachProductItemListeners(document.querySelector('.product-item'));
+            document.getElementById('distance').addEventListener('input', updateOverallTotals);
+            document.getElementById('price-per-km').addEventListener('input', updateOverallTotals);
+            document.getElementById('pix-discount-percentage').addEventListener('input', updateOverallTotals);
+            document.getElementById('logo-url').addEventListener('input', updateLogoDisplay); // Listener para o campo do logo
+
+            updateOverallTotals(); // Cálculo inicial
+            updateLogoDisplay(); // Exibe o logo se houver URL salvo
+            registerServiceWorker(); // Registra o Service Worker para PWA
+        });
+
+        function attachProductItemListeners(itemElement) {
+            itemElement.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', calculateProductTotalAndOverallTotals);
+            });
+            itemElement.querySelector('.delete-product').addEventListener('click', deleteProduct);
+        }
+
+        function addProduct() {
+            const productList = document.getElementById('product-list');
+            const newItem = document.createElement('div');
+            newItem.classList.add('product-item');
+            newItem.innerHTML = `
+                <input type="text" class="product-description" placeholder="Descrição do Produto">
+                <div class="input-group">
+                    <label>Qtd:</label>
+                    <input type="number" class="quantity-input" value="1" min="1">
+                </div>
+                <div class="input-group">
+                    <label>Valor (R$):</label>
+                    <input type="number" class="value-input" placeholder="0.00" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>acr. (%):</label>
+                    <input type="number" class="percentage-input" value="20" min="0">
+                </div>
+                <div class="total-display">R$ 0,00</div>
+                <button class="delete-product">X</button>
+            `;
+            productList.appendChild(newItem);
+
+            attachProductItemListeners(newItem); // Anexa listeners ao novo item
+            updateOverallTotals();
+        }
+
+        function deleteProduct(event) {
+            const productItem = event.target.closest('.product-item');
+            if (productItem) {
+                productItem.remove();
+                updateOverallTotals();
+            }
+        }
+
+        function calculateProductTotalAndOverallTotals(event) {
+            const input = event.target;
+            const productItem = input.closest('.product-item');
+
+            const quantityInput = productItem.querySelector('.quantity-input');
+            const valueInput = productItem.querySelector('.value-input');
+            const percentageInput = productItem.querySelector('.percentage-input');
+            const totalDisplay = productItem.querySelector('.total-display');
+
+            let quantity = parseFloat(quantityInput.value) || 0;
+            let value = parseFloat(valueInput.value) || 0;
+            let percentage = parseFloat(percentageInput.value) || 0;
+
+            if (quantity < 0) quantity = 0;
+            if (value < 0) value = 0;
+            if (percentage < 0) percentage = 0;
+
+            const itemSubtotal = value * quantity;
+            const itemTotalWithIncrease = itemSubtotal * (1 + percentage / 100);
+
+            totalDisplay.textContent = `R$ ${itemTotalWithIncrease.toFixed(2).replace('.', ',')}`;
+            updateOverallTotals();
+        }
+
+        function updateOverallTotals() {
+            let subtotalProducts = 0;
+            let totalProductsWithIncrease = 0;
+            let totalAdditionalValue = 0;
+
+            document.querySelectorAll('.product-item').forEach(item => {
+                const quantity = parseFloat(item.querySelector('.quantity-input').value) || 0;
+                const value = parseFloat(item.querySelector('.value-input').value) || 0;
+                const percentage = parseFloat(item.querySelector('.percentage-input').value) || 0;
+
+                const itemSubtotal = value * quantity;
+                const itemTotalWithIncrease = itemSubtotal * (1 + percentage / 100);
+                const itemAdditionalValue = itemTotalWithIncrease - itemSubtotal;
+
+                subtotalProducts += itemSubtotal;
+                totalProductsWithIncrease += itemTotalWithIncrease;
+                totalAdditionalValue += itemAdditionalValue;
+            });
+
+            let deliveryCost = 0;
+            const distance = parseFloat(document.getElementById('distance').value) || 0;
+            const pricePerKm = parseFloat(document.getElementById('price-per-km').value) || 0;
+
+            if (!isNaN(distance) && !isNaN(pricePerKm)) {
+                deliveryCost = distance * pricePerKm;
+            }
+            if (deliveryCost < 0) deliveryCost = 0;
+
+
+            let pixDiscountPercentage = parseFloat(document.getElementById('pix-discount-percentage').value) || 0;
+            if (pixDiscountPercentage < 0) pixDiscountPercentage = 0;
+            if (pixDiscountPercentage > 100) pixDiscountPercentage = 100;
+
+            const totalBeforeDiscount = totalProductsWithIncrease + deliveryCost;
+            const discountAmount = totalBeforeDiscount * (pixDiscountPercentage / 100); // Calcula o valor do desconto
+            const totalPay = totalBeforeDiscount - discountAmount;
+
+            document.getElementById('subtotal').textContent = subtotalProducts.toFixed(2).replace('.', ',');
+            document.getElementById('additional-value').textContent = totalAdditionalValue.toFixed(2).replace('.', ',');
+            document.getElementById('delivery-cost-summary-display').textContent = deliveryCost.toFixed(2).replace('.', ','); // Atualiza o valor de entrega online
+            document.getElementById('discount-amount-summary-display').textContent = discountAmount.toFixed(2).replace('.', ','); // Atualiza o valor do desconto online
+            document.getElementById('total-pay').textContent = totalPay.toFixed(2).replace('.', ',');
+        }
+
+        function updateLogoDisplay() {
+            const logoUrlInput = document.getElementById('logo-url');
+            const companyLogoImg = document.getElementById('company-logo');
+            const url = logoUrlInput.value;
+
+            if (url) {
+                companyLogoImg.src = url;
+                companyLogoImg.style.display = 'block'; // Mostra a imagem
+                // Adiciona um manipulador de erro caso a imagem não carregue
+                companyLogoImg.onerror = () => {
+                    companyLogoImg.style.display = 'none';
+                    companyLogoImg.src = ''; // Limpa o src para evitar novas tentativas de carregamento
+                    console.error('Erro ao carregar o logo da URL fornecida.');
+                };
+            } else {
+                companyLogoImg.style.display = 'none';
+                companyLogoImg.src = ''; // Limpa o src quando o campo está vazio
+            }
+        }
+
+        function printForm() {
+            // Prepara informações da empresa para impressão
+            const companyNameInput = document.getElementById('company-name');
+            const companyNameDisplay = document.querySelector('.print-only-company-name');
+            if (companyNameInput.value) {
+                companyNameDisplay.textContent = companyNameInput.value;
+                companyNameDisplay.style.display = 'block';
+            } else {
+                companyNameDisplay.style.display = 'none';
+            }
+
+            // Prepara o logo para impressão
+            const logoUrlInput = document.getElementById('logo-url');
+            const companyLogoImgPrint = document.createElement('img');
+            companyLogoImgPrint.src = logoUrlInput.value;
+            companyLogoImgPrint.alt = "Logo da Empresa";
+            companyLogoImgPrint.style.maxWidth = '150px'; // Tamanho para impressão
+            companyLogoImgPrint.style.maxHeight = '80px';
+            companyLogoImgPrint.style.display = 'block';
+            companyLogoImgPrint.style.margin = '0 auto 15px auto'; // Centraliza e adiciona margem
+            companyLogoImgPrint.onerror = () => { companyLogoImgPrint.style.display = 'none'; }; // Oculta se não carregar
+
+            // Adiciona o logo temporariamente ao corpo para impressão
+            const tempLogoContainer = document.createElement('div');
+            tempLogoContainer.classList.add('print-only-logo');
+            tempLogoContainer.style.textAlign = 'center';
+            tempLogoContainer.appendChild(companyLogoImgPrint);
+            document.body.prepend(tempLogoContainer); // Adiciona no topo do body para impressão
+
+
+            // Prepara informações do Pix para impressão
+            const pixKeyTypeSelect = document.getElementById('pix-key-type');
+            const pixKeyType = pixKeyTypeSelect.value;
+            const pixKeyTypeText = pixKeyTypeSelect.options[pixKeyTypeSelect.selectedIndex].text;
+            const pixKey = document.getElementById('pix-key').value;
+            const pixDescription = document.getElementById('pix-description').value;
+
+            const pixPrintInfo = document.getElementById('pix-print-info');
+            if (pixKey || pixDescription) {
+                pixPrintInfo.querySelector('.pix-key-display').textContent = pixKey;
+                pixPrintInfo.querySelector('.pix-description-display').textContent = pixDescription;
+                pixPrintInfo.style.display = 'block';
+            } else {
+                pixPrintInfo.style.display = 'none';
+            }
+
+            // Prepara informações de entrega para impressão
+            const distance = parseFloat(document.getElementById('distance').value) || 0;
+            const pricePerKm = parseFloat(document.getElementById('price-per-km').value) || 0;
+            let deliveryCost = 0;
+            if (!isNaN(distance) && !isNaN(pricePerKm)) {
+                deliveryCost = distance * pricePerKm;
+            }
+            const deliveryPrintInfo = document.getElementById('delivery-print-info');
+            if (deliveryCost > 0) {
+                deliveryPrintInfo.querySelector('.delivery-cost-display').textContent = deliveryCost.toFixed(2).replace('.', ',');
+                deliveryPrintInfo.style.display = 'block';
+            } else {
+                deliveryPrintInfo.style.display = 'none';
+            }
+
+            // Prepara informações de desconto para impressão
+            const pixDiscountPercentage = parseFloat(document.getElementById('pix-discount-percentage').value) || 0;
+            const discountPrintInfo = document.getElementById('discount-print-info');
+            if (pixDiscountPercentage > 0) {
+                discountPrintInfo.querySelector('.discount-percentage-display').textContent = `${pixDiscountPercentage.toFixed(1).replace('.', ',')}%`;
+                discountPrintInfo.style.display = 'block';
+            } else {
+                discountPrintInfo.style.display = 'none';
+            }
+
+            // Calcula e exibe o total bruto, valor do desconto e total a pagar na impressão
+            let subtotalProducts = 0;
+            let totalProductsWithIncrease = 0;
+
+            document.querySelectorAll('.product-item').forEach(item => {
+                const quantity = parseFloat(item.querySelector('.quantity-input').value) || 0;
+                const value = parseFloat(item.querySelector('.value-input').value) || 0;
+                const percentage = parseFloat(item.querySelector('.percentage-input').value) || 0;
+
+                const itemSubtotal = value * quantity;
+                const itemTotalWithIncrease = itemSubtotal * (1 + percentage / 100);
+
+                subtotalProducts += itemSubtotal;
+                totalProductsWithIncrease += itemTotalWithIncrease;
+            });
+
+            const totalBeforeDiscount = totalProductsWithIncrease + deliveryCost;
+            const discountAmount = totalBeforeDiscount * (pixDiscountPercentage / 100);
+            const totalPay = totalBeforeDiscount - discountAmount;
+
+            document.getElementById('gross-total-print-info').querySelector('.gross-total-display').textContent = totalBeforeDiscount.toFixed(2).replace('.', ',');
+            document.getElementById('discount-amount-print-info').querySelector('.discount-amount-display').textContent = discountAmount.toFixed(2).replace('.', ',');
+            document.getElementById('total-pay').textContent = totalPay.toFixed(2).replace('.', ',');
+
+
+            // Modifica a descrição para impressão (apenas descrição e total da linha)
+            document.querySelectorAll('.product-item').forEach(item => {
+                const descriptionInput = item.querySelector('.product-description');
+                const totalDisplay = item.querySelector('.total-display');
+
+                const originalDescription = descriptionInput.value;
+                const totalValue = totalDisplay.textContent;
+
+                descriptionInput.setAttribute('data-original-description', originalDescription);
+                descriptionInput.value = `${originalDescription} - ${totalValue}`; // Apenas descrição e total
+                item.classList.add('print-mode'); // Adiciona classe para estilos de impressão
+            });
+
+            // Esconde elementos online e mostra os de impressão
+            const printOnlyElements = document.querySelectorAll('.print-only');
+            const onlineOnlyElements = document.querySelectorAll('.online-only');
+
+            printOnlyElements.forEach(el => el.style.display = 'block');
+            onlineOnlyElements.forEach(el => el.style.display = 'none');
+
+            window.print();
+
+            // Reverte as mudanças após a impressão (importante para a visualização online)
+            printOnlyElements.forEach(el => el.style.display = 'none');
+            onlineOnlyElements.forEach(el => el.style.display = 'block');
+            if (tempLogoContainer) { // Remove o logo temporário após a impressão
+                tempLogoContainer.remove();
+            }
+
+            // Restaura as descrições originais e remove a classe de print
+            document.querySelectorAll('.product-item').forEach(item => {
+                const descriptionInput = item.querySelector('.product-description');
+                const originalDescription = descriptionInput.getAttribute('data-original-description');
+                if (originalDescription) {
+                    descriptionInput.value = originalDescription;
+                    descriptionInput.removeAttribute('data-original-description');
+                }
+                item.classList.remove('print-mode');
+            });
+        }
+
+        function saveForm() {
+            const products = [];
+            document.querySelectorAll('.product-item').forEach(item => {
+                products.push({
+                    description: item.querySelector('.product-description').value,
+                    quantity: item.querySelector('.quantity-input').value,
+                    value: item.querySelector('.value-input').value,
+                    percentage: item.querySelector('.percentage-input').value
+                });
+            });
+
+            const formData = {
+                companyName: document.getElementById('company-name').value,
+                logoUrl: document.getElementById('logo-url').value, // Salva o URL do logo
+                products: products,
+                distance: document.getElementById('distance').value,
+                pricePerKm: document.getElementById('price-per-km').value,
+                pixDiscountPercentage: document.getElementById('pix-discount-percentage').value,
+                pixKeyType: document.getElementById('pix-key-type').value,
+                pixKey: document.getElementById('pix-key').value,
+                pixDescription: document.getElementById('pix-description').value
+            };
+
+            localStorage.setItem('budgetForm', JSON.stringify(formData));
+            alert('Orçamento salvo com sucesso!');
+        }
+
+        function loadForm() {
+            const savedData = localStorage.getItem('budgetForm');
+            if (savedData) {
+                const formData = JSON.parse(savedData);
+
+                // Carrega o nome da empresa e o URL do logo
+                document.getElementById('company-name').value = formData.companyName || '';
+                document.getElementById('logo-url').value = formData.logoUrl || '';
+                updateLogoDisplay(); // Atualiza a exibição do logo
+
+                // Limpa os produtos atuais
+                const productList = document.getElementById('product-list');
+                productList.innerHTML = '';
+
+                // Carrega os produtos
+                formData.products.forEach(product => {
+                    const newItem = document.createElement('div');
+                    newItem.classList.add('product-item');
+                    newItem.innerHTML = `
+                        <input type="text" class="product-description" placeholder="Descrição do Produto" value="${product.description || ''}">
+                        <div class="input-group">
+                            <label>Qtd:</label>
+                            <input type="number" class="quantity-input" value="${product.quantity || '1'}" min="1">
+                        </div>
+                        <div class="input-group">
+                            <label>Valor (R$):</label>
+                            <input type="number" class="value-input" placeholder="0.00" step="0.01" value="${product.value || ''}">
+                        </div>
+                        <div class="input-group">
+                            <label>acr. (%):</label>
+                            <input type="number" class="percentage-input" value="${product.percentage || '20'}" min="0">
+                        </div>
+                        <div class="total-display">R$ 0,00</div>
+                        <button class="delete-product">X</button>
+                    `;
+                    productList.appendChild(newItem);
+                    attachProductItemListeners(newItem); // Anexa listeners aos novos itens carregados
+                });
+
+                // Carrega outros campos
+                document.getElementById('distance').value = formData.distance || '';
+                document.getElementById('price-per-km').value = formData.pricePerKm || '';
+                document.getElementById('pix-discount-percentage').value = formData.pixDiscountPercentage || '';
+                document.getElementById('pix-key-type').value = formData.pixKeyType || '';
+                document.getElementById('pix-key').value = formData.pixKey || '';
+                document.getElementById('pix-description').value = formData.pixDescription || '';
+
+                // Recalcula todos os totais após carregar
+                updateOverallTotals();
+                document.querySelectorAll('.product-item').forEach(item => {
+                    const event = new Event('input');
+                    item.querySelector('.value-input').dispatchEvent(event); // Dispara para atualizar os totais de cada linha
+                });
+
+                alert('Orçamento carregado com sucesso!');
+            } else {
+                alert('Nenhum orçamento salvo encontrado.');
+            }
+        }
+
+        // PWA - Registro do Service Worker
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('service-worker.js')
+                        .then(registration => {
+                            console.log('ServiceWorker registrado com sucesso:', registration.scope);
+                        })
+                        .catch(error => {
+                            console.log('Falha no registro do ServiceWorker:', error);
+                        });
+                });
+            }
+        }
+    </script>
+</body>
+</html>
