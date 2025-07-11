@@ -603,11 +603,11 @@
 
             <!-- Print view elements (hidden online) -->
             <div class="print-only" id="gross-total-print-info">
-                <span>Total Bruto (c/ acréscimo e entrega):</span>
+                <span>Total:</span>
                 <strong>R$ <span class="gross-total-display">0,00</span></strong>
             </div>
             <div class="print-only" id="discount-amount-print-info">
-                <span>Valor do Desconto:</span>
+                <span>Desconto:</span>
                 <strong>R$ <span class="discount-amount-display">0,00</span></strong>
             </div>
 
