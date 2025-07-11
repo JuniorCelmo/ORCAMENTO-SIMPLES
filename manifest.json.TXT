@@ -1,0 +1,21 @@
+{
+  "name": "Orçamento Simples",
+  "short_name": "Orçamento",
+  "description": "Um formulário simples para criar orçamentos.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f0f2f5",
+  "theme_color": "#007BFF",
+  "icons": [
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
