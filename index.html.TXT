@@ -306,6 +306,46 @@
             box-shadow: 0 6px 15px rgba(103, 58, 183, 0.3);
         }
 
+        /* New buttons styling */
+        .top-buttons-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+            justify-content: center; /* Centraliza os botões */
+        }
+        .top-buttons-group button {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            box-sizing: border-box;
+            text-align: center;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            min-width: 140px; /* Garante que os botões não fiquem muito pequenos */
+        }
+        .new-budget-button {
+            background-color: #dc3545; /* Vermelho para "Novo Orçamento" */
+            color: white;
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.2);
+        }
+        .new-budget-button:hover {
+            background-color: #c82333;
+            box-shadow: 0 6px 15px rgba(220, 53, 69, 0.3);
+        }
+        .reload-values-button {
+            background-color: #17a2b8; /* Azul ciano para "Recarregar Valores" */
+            color: white;
+            box-shadow: 0 4px 10px rgba(23, 162, 184, 0.2);
+        }
+        .reload-values-button:hover {
+            background-color: #138496;
+            box-shadow: 0 6px 15px rgba(23, 162, 184, 0.3);
+        }
+
+
         /* Estilos para impressão */
         @media print {
             body {
@@ -344,12 +384,15 @@
             .logo-input-group .logo-input-fields {
                 display: none !important;
             }
+            .top-buttons-group, /* Oculta os novos botões na impressão */
             .product-item input[type="number"],
             .product-item .value-input,
             .product-item .percentage-input,
             .add-product,
             .summary .subtotal,
             .summary .additional-value,
+            .delivery-cost-summary, /* Oculta o resumo de entrega online */
+            .discount-amount-summary, /* Oculta o resumo de desconto online */
             .pix-info .online-only,
             .delivery-section .online-only,
             .discount-section .online-only,
@@ -442,10 +485,10 @@
                 width: 100%;
                 margin-bottom: 10px;
             }
-            .button-group {
+            .button-group, .top-buttons-group {
                 flex-direction: column;
             }
-            .print-button, .save-button, .load-button {
+            .print-button, .save-button, .load-button, .new-budget-button, .reload-values-button {
                 width: 100%;
                 margin-bottom: 10px;
             }
@@ -483,8 +526,13 @@
             </div>
 
             <div class="logo-display-area">
-                <img id="company-logo" src="" alt="Logo da Empresa" onerror="this.style.display='none'; console.error('Erro ao carregar o logo da URL ou arquivo fornecido.');">
+                <img id="company-logo" src="" alt="Logo da Empresa">
             </div>
+        </div>
+
+        <div class="top-buttons-group">
+            <button class="new-budget-button" onclick="newBudget()">Novo Orçamento</button>
+            <button class="reload-values-button" onclick="reloadValues()">Recarregar Valores</button>
         </div>
 
         <div id="product-list">
@@ -760,6 +808,9 @@
             const companyLogoImg = document.getElementById('company-logo');
             companyLogoImg.style.display = 'none'; // Esconde a imagem por padrão
 
+            // Remove o onerror handler anterior para evitar duplicação ou conflitos
+            companyLogoImg.onerror = null;
+
             if (currentLogoSource === 'url') {
                 const logoUrlInput = document.getElementById('logo-url-input');
                 const url = logoUrlInput.value;
@@ -769,7 +820,7 @@
                     companyLogoImg.onerror = () => {
                         companyLogoImg.style.display = 'none';
                         companyLogoImg.src = '';
-                        console.error('Erro ao carregar o logo da URL fornecida.');
+                        console.error('Erro ao carregar o logo da URL fornecida: ' + url);
                     };
                 } else {
                     companyLogoImg.src = '';
@@ -877,7 +928,7 @@
                 };
                 companyLogoImgPrint.onerror = () => {
                     companyLogoImgPrint.style.display = 'none';
-                    console.error('Erro ao carregar o logo da URL para impressão.');
+                    console.error('Erro ao carregar o logo da URL para impressão: ' + logoUrlInput.value);
                     // Even if error, proceed with printing without the logo
                     finalizePrint();
                 };
@@ -1069,16 +1120,68 @@
             }
         }
 
+        // Função para iniciar um novo orçamento (limpar todos os campos)
+        function newBudget() {
+            // Limpa o nome da empresa
+            document.getElementById('company-name').value = '';
+
+            // Limpa o logo
+            document.getElementById('radio-logo-url').checked = true; // Volta para URL como padrão
+            document.getElementById('logo-url-input').value = '';
+            document.getElementById('logo-file-input').value = ''; // Limpa o arquivo selecionado
+            toggleLogoInputType(); // Atualiza a exibição do logo
+
+            // Remove todos os itens de produto, exceto o primeiro (se houver)
+            const productList = document.getElementById('product-list');
+            while (productList.children.length > 1) {
+                productList.removeChild(productList.lastChild);
+            }
+            // Reseta o primeiro item
+            const firstProductItem = productList.querySelector('.product-item');
+            if (firstProductItem) {
+                firstProductItem.querySelector('.product-description').value = '';
+                firstProductItem.querySelector('.quantity-input').value = '1';
+                firstProductItem.querySelector('.value-input').value = '';
+                firstProductItem.querySelector('.percentage-input').value = '20';
+                firstProductItem.querySelector('.total-display').textContent = 'R$ 0,00';
+            }
+
+            // Limpa informações de entrega
+            document.getElementById('distance').value = '';
+            document.getElementById('price-per-km').value = '';
+
+            // Limpa informações de desconto
+            document.getElementById('pix-discount-percentage').value = '';
+
+            // Limpa informações Pix
+            document.getElementById('pix-key-type').value = '';
+            document.getElementById('pix-key').value = '';
+            document.getElementById('pix-description').value = '';
+
+            // Recalcula todos os totais para zerar o resumo
+            updateOverallTotals();
+
+            alert('Novo orçamento iniciado!');
+        }
+
+        // Função para recarregar/atualizar os valores (recalcular totais)
+        function reloadValues() {
+            updateOverallTotals(); // Recalcula todos os totais
+            updateLogoDisplay(); // Garante que o logo está atualizado (especialmente se a URL foi alterada)
+            alert('Valores atualizados!');
+        }
+
+
         // PWA - Registro do Service Worker
         function registerServiceWorker() {
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('service-worker.js')
                         .then(registration => {
-                            console.log('ServiceWorker registrado com sucesso:', registration.scope);
+                            console.log('ServiceWorker registado com sucesso:', registration.scope);
                         })
                         .catch(error => {
-                            console.log('Falha no registro do ServiceWorker:', error);
+                            console.log('Falha no registo do ServiceWorker:', error);
                         });
                 });
             }
