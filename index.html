@@ -345,6 +345,27 @@
             box-shadow: 0 6px 15px rgba(23, 162, 184, 0.3);
         }
 
+        /* A2HS Button */
+        #install-app-button {
+            display: none; /* Hidden by default */
+            background-color: #6f42c1; /* Roxo */
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            margin-top: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 4px 10px rgba(111, 66, 193, 0.2);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        #install-app-button:hover {
+            background-color: #5a359a;
+            box-shadow: 0 6px 15px rgba(111, 66, 193, 0.3);
+        }
+
 
         /* Estilos para impressão */
         @media print {
@@ -385,6 +406,7 @@
                 display: none !important;
             }
             .top-buttons-group, /* Oculta os novos botões na impressão */
+            #install-app-button, /* Oculta o botão de instalação na impressão */
             .product-item input[type="number"],
             .product-item .value-input,
             .product-item .percentage-input,
@@ -488,7 +510,7 @@
             .button-group, .top-buttons-group {
                 flex-direction: column;
             }
-            .print-button, .save-button, .load-button, .new-budget-button, .reload-values-button {
+            .print-button, .save-button, .load-button, .new-budget-button, .reload-values-button, #install-app-button {
                 width: 100%;
                 margin-bottom: 10px;
             }
@@ -534,6 +556,8 @@
             <button class="new-budget-button" onclick="newBudget()">Novo Orçamento</button>
             <button class="reload-values-button" onclick="reloadValues()">Recarregar Valores</button>
         </div>
+
+        <button id="install-app-button">Adicionar à Tela Inicial</button>
 
         <div id="product-list">
             <div class="product-item">
@@ -637,7 +661,7 @@
 
             <div class="print-only" id="pix-print-info">
                 <p><strong>Informações para Pagamento via Pix:</strong></p>
-                <!-- Removido o span do tipo da chave Pix para impressão -->
+                <p>Tipo de Chave: <span class="pix-key-type-display"></span></p> <!-- Added for printing Pix key type -->
                 <p>Chave Pix: <span class="pix-key-display"></span></p>
                 <p>Identificação: <span class="pix-description-display"></span></p>
             </div>
@@ -656,6 +680,7 @@
 
     <script>
         let currentLogoSource = 'url'; // Variável para controlar a fonte do logo (url ou file)
+        let deferredPrompt; // Variável para armazenar o evento beforeinstallprompt
 
         document.addEventListener('DOMContentLoaded', () => {
             // Adiciona listeners para os campos da primeira linha e os campos de entrega/desconto
@@ -675,6 +700,38 @@
             updateOverallTotals(); // Cálculo inicial
             loadForm(); // Tenta carregar dados salvos, incluindo o logo
             registerServiceWorker(); // Registra o Service Worker para PWA
+
+            // PWA - Listener para o evento beforeinstallprompt
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Previne que o mini-infobar apareça automaticamente
+                e.preventDefault();
+                // Armazena o evento para que possa ser acionado mais tarde.
+                deferredPrompt = e;
+                // Mostra o botão de instalação
+                const installButton = document.getElementById('install-app-button');
+                if (installButton) {
+                    installButton.style.display = 'block';
+                }
+            });
+
+            // PWA - Listener para o clique no botão de instalação
+            const installButton = document.getElementById('install-app-button');
+            if (installButton) {
+                installButton.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        // Esconde o botão de instalação
+                        installButton.style.display = 'none';
+                        // Mostra o prompt de instalação
+                        deferredPrompt.prompt();
+                        // Espera pela resposta do utilizador ao prompt
+                        const { outcome } = await deferredPrompt.userChoice;
+                        // Opcional: Log o resultado da escolha do utilizador
+                        console.log(`User response to the A2HS prompt: ${outcome}`);
+                        // Limpa o evento armazenado, pois só pode ser usado uma vez.
+                        deferredPrompt = null;
+                    }
+                });
+            }
         });
 
         function attachProductItemListeners(itemElement) {
@@ -959,10 +1016,14 @@
             }
 
             // Prepare Pix info for printing (moved outside logo loading logic)
+            const pixKeyTypeSelect = document.getElementById('pix-key-type');
+            const pixKeyTypeText = pixKeyTypeSelect.options[pixKeyTypeSelect.selectedIndex].text; // Get selected text
             const pixKey = document.getElementById('pix-key').value;
             const pixDescription = document.getElementById('pix-description').value;
+
             const pixPrintInfo = document.getElementById('pix-print-info');
-            if (pixKey || pixDescription) {
+            if (pixKey || pixDescription || pixKeyTypeText !== 'Selecione o tipo') { // Check if any Pix info is present
+                pixPrintInfo.querySelector('.pix-key-type-display').textContent = pixKeyTypeText; // Set Pix key type
                 pixPrintInfo.querySelector('.pix-key-display').textContent = pixKey;
                 pixPrintInfo.querySelector('.pix-description-display').textContent = pixDescription;
                 pixPrintInfo.style.display = 'block';
