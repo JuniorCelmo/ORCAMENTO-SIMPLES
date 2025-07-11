@@ -57,6 +57,43 @@
         .logo-input-group {
             margin-top: 15px;
             margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #e8e8e8;
+            border-radius: 12px;
+            background-color: #fcfcfc;
+        }
+        .logo-input-group .radio-options {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .logo-input-group .radio-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .logo-input-group .radio-option input[type="radio"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+        .logo-input-group .logo-input-fields {
+            margin-top: 10px;
+        }
+        .logo-input-group .logo-input-fields label {
+            text-align: left;
+            margin-bottom: 5px;
+        }
+        .logo-input-group .logo-input-fields input[type="text"],
+        .logo-input-group .logo-input-fields input[type="file"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            font-size: 0.95em;
+            box-sizing: border-box;
+            height: 40px;
+            margin-bottom: 10px;
         }
         .logo-display-area {
             margin-top: 10px;
@@ -302,6 +339,11 @@
                 font-weight: bold;
                 margin-bottom: 10px;
             }
+            .logo-input-group, /* Oculta todo o grupo de input de logo online */
+            .logo-input-group .radio-options,
+            .logo-input-group .logo-input-fields {
+                display: none !important;
+            }
             .product-item input[type="number"],
             .product-item .value-input,
             .product-item .percentage-input,
@@ -421,10 +463,27 @@
         </div>
 
         <div class="logo-input-group">
-            <label for="logo-url">URL do Logo da Empresa:</label>
-            <input type="text" id="logo-url" placeholder="Cole aqui o endereço da imagem do seu logo (ex: https://seusite.com/logo.png)">
+            <div class="radio-options">
+                <label class="radio-option">
+                    <input type="radio" name="logo-source-type" value="url" id="radio-logo-url" checked> URL do Logo
+                </label>
+                <label class="radio-option">
+                    <input type="radio" name="logo-source-type" value="file" id="radio-logo-file"> Upload de Arquivo Local
+                </label>
+            </div>
+
+            <div id="logo-url-fields" class="logo-input-fields">
+                <label for="logo-url-input">URL do Logo da Empresa:</label>
+                <input type="text" id="logo-url-input" placeholder="Cole aqui o endereço da imagem do seu logo (ex: https://seusite.com/logo.png)">
+            </div>
+
+            <div id="logo-file-fields" class="logo-input-fields" style="display: none;">
+                <label for="logo-file-input">Selecione o arquivo do Logo:</label>
+                <input type="file" id="logo-file-input" accept="image/*">
+            </div>
+
             <div class="logo-display-area">
-                <img id="company-logo" src="" alt="Logo da Empresa" onerror="this.style.display='none';">
+                <img id="company-logo" src="" alt="Logo da Empresa" onerror="this.style.display='none'; console.error('Erro ao carregar o logo da URL ou arquivo fornecido.');">
             </div>
         </div>
 
@@ -548,16 +607,25 @@
     </div>
 
     <script>
+        let currentLogoSource = 'url'; // Variável para controlar a fonte do logo (url ou file)
+
         document.addEventListener('DOMContentLoaded', () => {
             // Adiciona listeners para os campos da primeira linha e os campos de entrega/desconto
             attachProductItemListeners(document.querySelector('.product-item'));
             document.getElementById('distance').addEventListener('input', updateOverallTotals);
             document.getElementById('price-per-km').addEventListener('input', updateOverallTotals);
             document.getElementById('pix-discount-percentage').addEventListener('input', updateOverallTotals);
-            document.getElementById('logo-url').addEventListener('input', updateLogoDisplay); // Listener para o campo do logo
+
+            // Listeners para os botões de rádio do logo
+            document.getElementById('radio-logo-url').addEventListener('change', toggleLogoInputType);
+            document.getElementById('radio-logo-file').addEventListener('change', toggleLogoInputType);
+
+            // Listeners para os inputs de logo
+            document.getElementById('logo-url-input').addEventListener('input', updateLogoDisplay);
+            document.getElementById('logo-file-input').addEventListener('change', updateLogoDisplay);
 
             updateOverallTotals(); // Cálculo inicial
-            updateLogoDisplay(); // Exibe o logo se houver URL salvo
+            loadForm(); // Tenta carregar dados salvos, incluindo o logo
             registerServiceWorker(); // Registra o Service Worker para PWA
         });
 
@@ -671,23 +739,60 @@
             document.getElementById('total-pay').textContent = totalPay.toFixed(2).replace('.', ',');
         }
 
-        function updateLogoDisplay() {
-            const logoUrlInput = document.getElementById('logo-url');
-            const companyLogoImg = document.getElementById('company-logo');
-            const url = logoUrlInput.value;
+        function toggleLogoInputType() {
+            const urlFields = document.getElementById('logo-url-fields');
+            const fileFields = document.getElementById('logo-file-fields');
+            const radioUrl = document.getElementById('radio-logo-url');
 
-            if (url) {
-                companyLogoImg.src = url;
-                companyLogoImg.style.display = 'block'; // Mostra a imagem
-                // Adiciona um manipulador de erro caso a imagem não carregue
-                companyLogoImg.onerror = () => {
-                    companyLogoImg.style.display = 'none';
-                    companyLogoImg.src = ''; // Limpa o src para evitar novas tentativas de carregamento
-                    console.error('Erro ao carregar o logo da URL fornecida.');
-                };
+            if (radioUrl.checked) {
+                urlFields.style.display = 'block';
+                fileFields.style.display = 'none';
+                currentLogoSource = 'url';
             } else {
-                companyLogoImg.style.display = 'none';
-                companyLogoImg.src = ''; // Limpa o src quando o campo está vazio
+                urlFields.style.display = 'none';
+                fileFields.style.display = 'block';
+                currentLogoSource = 'file';
+            }
+            updateLogoDisplay(); // Atualiza a exibição do logo após a troca
+        }
+
+        function updateLogoDisplay() {
+            const companyLogoImg = document.getElementById('company-logo');
+            companyLogoImg.style.display = 'none'; // Esconde a imagem por padrão
+
+            if (currentLogoSource === 'url') {
+                const logoUrlInput = document.getElementById('logo-url-input');
+                const url = logoUrlInput.value;
+                if (url) {
+                    companyLogoImg.src = url;
+                    companyLogoImg.style.display = 'block';
+                    companyLogoImg.onerror = () => {
+                        companyLogoImg.style.display = 'none';
+                        companyLogoImg.src = '';
+                        console.error('Erro ao carregar o logo da URL fornecida.');
+                    };
+                } else {
+                    companyLogoImg.src = '';
+                }
+            } else if (currentLogoSource === 'file') {
+                const logoFileInput = document.getElementById('logo-file-input');
+                const file = logoFileInput.files[0];
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        companyLogoImg.src = e.target.result;
+                        companyLogoImg.style.display = 'block';
+                    };
+                    reader.onerror = () => {
+                        companyLogoImg.style.display = 'none';
+                        companyLogoImg.src = '';
+                        console.error('Erro ao ler o arquivo de logo local.');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    companyLogoImg.src = '';
+                }
             }
         }
 
@@ -703,31 +808,108 @@
             }
 
             // Prepara o logo para impressão
-            const logoUrlInput = document.getElementById('logo-url');
             const companyLogoImgPrint = document.createElement('img');
-            companyLogoImgPrint.src = logoUrlInput.value;
-            companyLogoImgPrint.alt = "Logo da Empresa";
-            companyLogoImgPrint.style.maxWidth = '150px'; // Tamanho para impressão
-            companyLogoImgPrint.style.maxHeight = '80px';
-            companyLogoImgPrint.style.display = 'block';
-            companyLogoImgPrint.style.margin = '0 auto 15px auto'; // Centraliza e adiciona margem
-            companyLogoImgPrint.onerror = () => { companyLogoImgPrint.style.display = 'none'; }; // Oculta se não carregar
-
-            // Adiciona o logo temporariamente ao corpo para impressão
             const tempLogoContainer = document.createElement('div');
             tempLogoContainer.classList.add('print-only-logo');
             tempLogoContainer.style.textAlign = 'center';
             tempLogoContainer.appendChild(companyLogoImgPrint);
-            document.body.prepend(tempLogoContainer); // Adiciona no topo do body para impressão
 
+            const logoUrlInput = document.getElementById('logo-url-input');
+            const logoFileInput = document.getElementById('logo-file-input');
 
-            // Prepara informações do Pix para impressão
-            const pixKeyTypeSelect = document.getElementById('pix-key-type');
-            const pixKeyType = pixKeyTypeSelect.value;
-            const pixKeyTypeText = pixKeyTypeSelect.options[pixKeyTypeSelect.selectedIndex].text;
+            // Function to finalize the print process after logo is handled
+            const finalizePrint = () => {
+                // Modifica a descrição para impressão (agora incluindo a quantidade novamente)
+                document.querySelectorAll('.product-item').forEach(item => {
+                    const quantity = item.querySelector('.quantity-input').value; // Pega a quantidade
+                    const descriptionInput = item.querySelector('.product-description');
+                    const totalDisplay = item.querySelector('.total-display');
+
+                    const originalDescription = descriptionInput.value;
+                    const totalValue = totalDisplay.textContent;
+
+                    descriptionInput.setAttribute('data-original-description', originalDescription);
+                    // Retorna ao formato: Descrição (Qtd) - Total
+                    descriptionInput.value = `${originalDescription} (${quantity}x) - ${totalValue}`;
+                    item.classList.add('print-mode'); // Adiciona classe para estilos de impressão
+                });
+
+                // Esconde elementos online e mostra os de impressão
+                const printOnlyElements = document.querySelectorAll('.print-only');
+                const onlineOnlyElements = document.querySelectorAll('.online-only');
+
+                printOnlyElements.forEach(el => el.style.display = 'block');
+                onlineOnlyElements.forEach(el => el.style.display = 'none');
+
+                window.print();
+
+                // Reverte as mudanças após a impressão (importante para a visualização online)
+                printOnlyElements.forEach(el => el.style.display = 'none');
+                onlineOnlyElements.forEach(el => el.style.display = 'block');
+                if (tempLogoContainer) { // Remove o logo temporário após a impressão
+                    tempLogoContainer.remove();
+                }
+
+                // Restaura as descrições originais e remove a classe de print
+                document.querySelectorAll('.product-item').forEach(item => {
+                    const descriptionInput = item.querySelector('.product-description');
+                    const originalDescription = descriptionInput.getAttribute('data-original-description');
+                    if (originalDescription) {
+                        descriptionInput.value = originalDescription;
+                        descriptionInput.removeAttribute('data-original-description');
+                    }
+                    item.classList.remove('print-mode');
+                });
+            };
+
+            // Handle logo loading based on currentLogoSource
+            if (currentLogoSource === 'url' && logoUrlInput.value) {
+                companyLogoImgPrint.src = logoUrlInput.value;
+                companyLogoImgPrint.alt = "Logo da Empresa";
+                companyLogoImgPrint.style.maxWidth = '150px';
+                companyLogoImgPrint.style.maxHeight = '80px';
+                companyLogoImgPrint.style.display = 'block';
+                companyLogoImgPrint.style.margin = '0 auto 15px auto';
+
+                companyLogoImgPrint.onload = () => {
+                    document.body.prepend(tempLogoContainer); // Add container only when image is loaded
+                    finalizePrint();
+                };
+                companyLogoImgPrint.onerror = () => {
+                    companyLogoImgPrint.style.display = 'none';
+                    console.error('Erro ao carregar o logo da URL para impressão.');
+                    // Even if error, proceed with printing without the logo
+                    finalizePrint();
+                };
+            } else if (currentLogoSource === 'file' && logoFileInput.files.length > 0) {
+                const file = logoFileInput.files[0];
+                const reader = new FileReader();
+
+                reader.onloadend = () => {
+                    companyLogoImgPrint.src = reader.result;
+                    companyLogoImgPrint.alt = "Logo da Empresa";
+                    companyLogoImgPrint.style.maxWidth = '150px';
+                    companyLogoImgPrint.style.maxHeight = '80px';
+                    companyLogoImgPrint.style.display = 'block';
+                    companyLogoImgPrint.style.margin = '0 auto 15px auto';
+                    document.body.prepend(tempLogoContainer); // Add container when file is read
+                    finalizePrint();
+                };
+                reader.onerror = () => {
+                    companyLogoImgPrint.style.display = 'none';
+                    console.error('Erro ao ler o arquivo de logo local para impressão.');
+                    // Even if error, proceed with printing without the logo
+                    finalizePrint();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // No logo selected or invalid source, proceed directly
+                finalizePrint();
+            }
+
+            // Prepare Pix info for printing (moved outside logo loading logic)
             const pixKey = document.getElementById('pix-key').value;
             const pixDescription = document.getElementById('pix-description').value;
-
             const pixPrintInfo = document.getElementById('pix-print-info');
             if (pixKey || pixDescription) {
                 pixPrintInfo.querySelector('.pix-key-display').textContent = pixKey;
@@ -737,7 +919,7 @@
                 pixPrintInfo.style.display = 'none';
             }
 
-            // Prepara informações de entrega para impressão
+            // Prepare delivery info for printing (moved outside logo loading logic)
             const distance = parseFloat(document.getElementById('distance').value) || 0;
             const pricePerKm = parseFloat(document.getElementById('price-per-km').value) || 0;
             let deliveryCost = 0;
@@ -752,7 +934,7 @@
                 deliveryPrintInfo.style.display = 'none';
             }
 
-            // Prepara informações de desconto para impressão
+            // Prepare discount info for printing (moved outside logo loading logic)
             const pixDiscountPercentage = parseFloat(document.getElementById('pix-discount-percentage').value) || 0;
             const discountPrintInfo = document.getElementById('discount-print-info');
             if (pixDiscountPercentage > 0) {
@@ -762,7 +944,7 @@
                 discountPrintInfo.style.display = 'none';
             }
 
-            // Calcula e exibe o total bruto, valor do desconto e total a pagar na impressão
+            // Calculate and display gross total, discount amount, and total to pay for printing
             let subtotalProducts = 0;
             let totalProductsWithIncrease = 0;
 
@@ -785,48 +967,8 @@
             document.getElementById('gross-total-print-info').querySelector('.gross-total-display').textContent = totalBeforeDiscount.toFixed(2).replace('.', ',');
             document.getElementById('discount-amount-print-info').querySelector('.discount-amount-display').textContent = discountAmount.toFixed(2).replace('.', ',');
             document.getElementById('total-pay').textContent = totalPay.toFixed(2).replace('.', ',');
-
-
-            // Modifica a descrição para impressão (apenas descrição e total da linha)
-            document.querySelectorAll('.product-item').forEach(item => {
-                const descriptionInput = item.querySelector('.product-description');
-                const totalDisplay = item.querySelector('.total-display');
-
-                const originalDescription = descriptionInput.value;
-                const totalValue = totalDisplay.textContent;
-
-                descriptionInput.setAttribute('data-original-description', originalDescription);
-                descriptionInput.value = `${originalDescription} - ${totalValue}`; // Apenas descrição e total
-                item.classList.add('print-mode'); // Adiciona classe para estilos de impressão
-            });
-
-            // Esconde elementos online e mostra os de impressão
-            const printOnlyElements = document.querySelectorAll('.print-only');
-            const onlineOnlyElements = document.querySelectorAll('.online-only');
-
-            printOnlyElements.forEach(el => el.style.display = 'block');
-            onlineOnlyElements.forEach(el => el.style.display = 'none');
-
-            window.print();
-
-            // Reverte as mudanças após a impressão (importante para a visualização online)
-            printOnlyElements.forEach(el => el.style.display = 'none');
-            onlineOnlyElements.forEach(el => el.style.display = 'block');
-            if (tempLogoContainer) { // Remove o logo temporário após a impressão
-                tempLogoContainer.remove();
-            }
-
-            // Restaura as descrições originais e remove a classe de print
-            document.querySelectorAll('.product-item').forEach(item => {
-                const descriptionInput = item.querySelector('.product-description');
-                const originalDescription = descriptionInput.getAttribute('data-original-description');
-                if (originalDescription) {
-                    descriptionInput.value = originalDescription;
-                    descriptionInput.removeAttribute('data-original-description');
-                }
-                item.classList.remove('print-mode');
-            });
         }
+
 
         function saveForm() {
             const products = [];
@@ -841,7 +983,9 @@
 
             const formData = {
                 companyName: document.getElementById('company-name').value,
-                logoUrl: document.getElementById('logo-url').value, // Salva o URL do logo
+                logoUrl: document.getElementById('logo-url-input').value, // Salva o URL do logo (apenas URL, não arquivo local)
+                lastLogoSource: currentLogoSource, // Salva qual tipo de input de logo estava selecionado
+                // Note: File data from logo-file-input cannot be directly saved to localStorage for security/size reasons.
                 products: products,
                 distance: document.getElementById('distance').value,
                 pricePerKm: document.getElementById('price-per-km').value,
@@ -860,10 +1004,20 @@
             if (savedData) {
                 const formData = JSON.parse(savedData);
 
-                // Carrega o nome da empresa e o URL do logo
+                // Carrega o nome da empresa
                 document.getElementById('company-name').value = formData.companyName || '';
-                document.getElementById('logo-url').value = formData.logoUrl || '';
-                updateLogoDisplay(); // Atualiza a exibição do logo
+
+                // Carrega o URL do logo e o tipo de input de logo selecionado
+                document.getElementById('logo-url-input').value = formData.logoUrl || '';
+                currentLogoSource = formData.lastLogoSource || 'url'; // Define a fonte do logo
+
+                // Seleciona o radio button correto e atualiza a exibição
+                if (currentLogoSource === 'file') {
+                    document.getElementById('radio-logo-file').checked = true;
+                } else {
+                    document.getElementById('radio-logo-url').checked = true;
+                }
+                toggleLogoInputType(); // Chama para exibir o campo correto e o logo (se URL)
 
                 // Limpa os produtos atuais
                 const productList = document.getElementById('product-list');
@@ -896,7 +1050,7 @@
 
                 // Carrega outros campos
                 document.getElementById('distance').value = formData.distance || '';
-                document.getElementById('price-per-km').value = formData.pricePerKm || '';
+                document.getElementById('pricePerKm').value = formData.pricePerKm || '';
                 document.getElementById('pix-discount-percentage').value = formData.pixDiscountPercentage || '';
                 document.getElementById('pix-key-type').value = formData.pixKeyType || '';
                 document.getElementById('pix-key').value = formData.pixKey || '';
