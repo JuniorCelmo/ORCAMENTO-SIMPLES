@@ -366,6 +366,35 @@
             box-shadow: 0 6px 15px rgba(111, 66, 193, 0.3);
         }
 
+        /* WhatsApp Support Button */
+        .whatsapp-support-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .whatsapp-support-button {
+            background-color: #25D366; /* Verde WhatsApp */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            display: inline-flex; /* Para alinhar o ícone e texto */
+            align-items: center;
+            gap: 8px; /* Espaçamento entre ícone e texto */
+            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.2);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .whatsapp-support-button:hover {
+            background-color: #1DA851;
+            box-shadow: 0 6px 15px rgba(37, 211, 102, 0.3);
+        }
+        .whatsapp-support-button svg {
+            width: 20px;
+            height: 20px;
+            fill: white; /* Cor do ícone */
+        }
+
 
         /* Estilos para impressão */
         @media print {
@@ -407,6 +436,7 @@
             }
             .top-buttons-group, /* Oculta os novos botões na impressão */
             #install-app-button, /* Oculta o botão de instalação na impressão */
+            .whatsapp-support-container, /* Oculta o botão de WhatsApp na impressão */
             .product-item input[type="number"],
             .product-item .value-input,
             .product-item .percentage-input,
@@ -510,7 +540,7 @@
             .button-group, .top-buttons-group {
                 flex-direction: column;
             }
-            .print-button, .save-button, .load-button, .new-budget-button, .reload-values-button, #install-app-button {
+            .print-button, .save-button, .load-button, .new-budget-button, .reload-values-button, #install-app-button, .whatsapp-support-button {
                 width: 100%;
                 margin-bottom: 10px;
             }
@@ -676,6 +706,15 @@
             <button class="save-button" onclick="saveForm()">Salvar Orçamento</button>
             <button class="load-button" onclick="loadForm()">Carregar Orçamento</button>
         </div>
+
+        <div class="whatsapp-support-container">
+            <button class="whatsapp-support-button" onclick="openWhatsAppGroup()">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
+                    <path d="M12.04 2C7.34 2 3.58 5.76 3.58 10.46C3.58 12.11 4.07 13.63 4.93 14.93L3.79 18.21L7.2 17.06C8.36 17.78 9.68 18.17 11.04 18.17H11.08C15.79 18.17 19.55 14.41 19.55 9.71C19.55 5.01 15.79 2 11.04 2ZM16.63 13.06C16.43 13.46 14.99 14.28 14.7 14.39C14.42 14.51 14.2 14.53 13.92 14.16C13.64 13.79 12.67 12.6 12.35 12.18C12.03 11.76 11.76 11.69 11.53 11.77C11.3 11.84 10.23 12.37 9.94 12.69C9.66 13.01 9.4 13.31 9.13 13.34C8.86 13.37 8.61 13.29 8.36 12.92C8.11 12.55 7.42 10.96 7.15 10.42C6.88 9.88 6.94 9.63 7.14 9.42C7.34 9.22 7.6 8.87 7.86 8.61C8.12 8.35 8.38 8.27 8.58 8.01C8.78 7.75 8.97 7.39 9.23 7.07C9.49 6.75 9.76 6.67 9.99 6.69C10.22 6.72 10.49 6.75 10.74 7.3C11 7.85 11.7 8.92 11.77 9.06C11.84 9.2 11.9 9.23 12.13 9.14C12.36 9.05 13.05 8.78 13.8 8.16C14.42 7.65 14.92 7.5 15.11 7.42C15.3 7.34 15.49 7.31 15.72 7.35C15.95 7.39 16.14 7.97 16.36 8.34C16.59 8.71 16.82 9.84 16.57 10.37C16.32 10.9 16.63 13.06 16.63 13.06Z" />
+                </svg>
+                Suporte WhatsApp
+            </button>
+        </div>
     </div>
 
     <script>
@@ -688,6 +727,7 @@
             document.getElementById('distance').addEventListener('input', updateOverallTotals);
             document.getElementById('price-per-km').addEventListener('input', updateOverallTotals);
             document.getElementById('pix-discount-percentage').addEventListener('input', updateOverallTotals);
+            document.getElementById('pix-key-type').addEventListener('input', updateOverallTotals); // Adicionado para atualizar ao mudar o tipo de chave Pix
 
             // Listeners para os botões de rádio do logo
             document.getElementById('radio-logo-url').addEventListener('change', toggleLogoInputType);
@@ -1230,6 +1270,13 @@
             updateOverallTotals(); // Recalcula todos os totais
             updateLogoDisplay(); // Garante que o logo está atualizado (especialmente se a URL foi alterada)
             alert('Valores atualizados!');
+        }
+
+        // Função para abrir o grupo de WhatsApp
+        function openWhatsAppGroup() {
+            // Substitua 'SEU_LINK_DO_GRUPO' pelo link real do seu grupo de WhatsApp
+            const whatsappLink = 'https://chat.whatsapp.com/ESoTBlLX4DJ5nCubjTMzD1';
+            window.open(whatsappLink, '_blank');
         }
 
 

@@ -1275,7 +1275,7 @@
         // Função para abrir o grupo de WhatsApp
         function openWhatsAppGroup() {
             // Substitua 'SEU_LINK_DO_GRUPO' pelo link real do seu grupo de WhatsApp
-            const whatsappLink = 'https://chat.whatsapp.com/SEU_LINK_DO_GRUPO';
+            const whatsappLink = 'https://chat.whatsapp.com/ESoTBlLX4DJ5nCubjTMzD1';
             window.open(whatsappLink, '_blank');
         }
 
