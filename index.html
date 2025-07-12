@@ -544,19 +544,16 @@
             }
             /* Exibe o novo contentor para os detalhes do item na impressão */
             .product-item .print-only-item-details {
-                display: block !important; /* Changed to block */
+                display: flex !important; /* Changed to flex */
+                justify-content: space-between !important;
+                align-items: flex-start !important; /* Align to top for multi-line descriptions */
                 width: 100% !important;
                 padding: 0 !important;
                 margin: 0 !important;
-                /* Clearfix for floated elements */
-                content: "";
-                display: table;
-                clear: both;
             }
             .product-item .print-only-description-qty { /* Novo span para descrição + quantidade */
-                display: inline-block !important;
-                width: calc(100% - 90px) !important; /* Adjusted width */
-                float: left !important; /* Float left */
+                display: block !important; /* Block within flex item */
+                flex: 1 !important; /* Takes available space */
                 font-weight: bold !important;
                 font-size: 1em !important;
                 color: #333 !important;
@@ -566,9 +563,9 @@
                 vertical-align: top !important; /* Align to top if multi-line */
             }
             .product-item .print-only-item-total {
-                display: inline-block !important;
+                display: block !important; /* Block within flex item */
+                flex-shrink: 0 !important; /* Don't shrink */
                 width: 80px !important; /* Fixed width for the total */
-                float: right !important; /* Float right */
                 font-weight: bold !important;
                 font-size: 1em !important;
                 color: #333 !important;
@@ -645,7 +642,7 @@
                 width: 100%;
                 margin-bottom: 10px;
             }
-        }
+        </media>
     </style>
 </head>
 <body>
@@ -1105,7 +1102,7 @@
                     printItemTotalSpan.textContent = `R$ ${itemTotalWithIncrease.toFixed(2).replace('.', ',')}`;
 
                     // Show the print-only container for each item
-                    item.querySelector('.print-only-item-details').style.display = 'block'; // Changed to block
+                    item.querySelector('.print-only-item-details').style.display = 'flex'; // Changed to flex
                 });
 
                 // Hide online-only elements
