@@ -490,6 +490,9 @@
             }
             .print-only-logo img {
                 display: block !important;
+                max-width: 150px; /* Ensure it's not too big */
+                max-height: 80px; /* Ensure it's not too tall */
+                margin: 0 auto; /* Center the image */
             }
 
             .logo-input-group, /* Oculta todo o grupo de input de logo online */
@@ -517,41 +520,48 @@
             .credit-card-info,
             .delete-product,
             .product-item label, /* Oculta todas as labels dos itens de produto */
-            .product-item div.input-group /* Oculta os grupos de input (Qtd, Valor, Acr.) */
+            .product-item div.input-group, /* Oculta os grupos de input (Qtd, Valor, Acr.) */
+            .product-item .total-display /* Oculta o total-display online */
             {
                 display: none !important;
             }
             .product-item {
-                display: block; /* Cada item toma a largura total */
+                display: flex; /* Use flexbox para alinhar descrição e total */
+                justify-content: space-between;
+                align-items: flex-start;
                 border-bottom: 1px dashed #eee; /* Separador para itens */
                 padding-bottom: 5px;
                 margin-bottom: 10px;
-                position: relative; /* Para posicionar o total à direita */
+                position: relative;
+                background: none !important; /* Remove background */
+                border: none !important; /* Remove borders */
+                box-shadow: none !important; /* Remove shadows */
             }
             .product-item .product-description {
-                width: calc(100% - 100px); /* Ajusta largura para o total impresso */
+                display: none !important; /* Oculta o input de descrição original */
+            }
+            .product-item .print-only-description-qty { /* Novo span para descrição + quantidade */
+                display: inline-block !important; /* Exibe o novo span */
+                flex: 1; /* Permite que ocupe espaço */
                 font-weight: bold;
-                margin-bottom: 5px;
-                display: inline-block !important; /* Para ficar na mesma linha que os outros detalhes */
-                vertical-align: top; /* Alinha ao topo se o texto for longo */
-            }
-            .product-item .print-only-quantity {
-                display: inline-block !important; /* Exibe inline para layout compacto */
-                margin-right: 8px; /* Espaçamento entre os valores */
-                font-size: 0.9em;
+                font-size: 1em;
                 color: #333;
-                white-space: nowrap; /* Evita quebra de linha */
+                margin-right: 10px; /* Espaço entre descrição e total */
+                word-wrap: break-word; /* Quebra de palavra para texto longo */
             }
-            .product-item .print-only-value, /* Oculta explicitamente o valor unitário na impressão */
-            .product-item .print-only-percentage { /* Oculta explicitamente o acréscimo percentual na impressão */
+            .product-item .print-only-quantity, /* Estes são agora redundantes e devem ser ocultados */
+            .product-item .print-only-value,
+            .product-item .print-only-percentage {
                 display: none !important;
             }
             .product-item .print-only-item-total {
                 display: inline-block !important;
                 font-weight: bold;
-                float: right; /* Alinha o total à direita */
                 font-size: 1em;
                 color: #333;
+                text-align: right;
+                flex-shrink: 0; /* Não encolhe */
+                width: 80px; /* Largura fixa para o total */
             }
 
             .summary {
@@ -571,10 +581,10 @@
             }
             .pix-info, .delivery-section, .discount-section, .credit-card-info {
                 display: block !important;
-                background-color: #fff;
+                background-color: #fff !important;
                 border: none !important; /* Remove borda na impressão */
                 box-shadow: none !important; /* Remove sombra na impressão */
-                padding: 0;
+                padding: 0 !important;
                 margin-top: 15px;
             }
              .pix-info label, .delivery-section label, .discount-section label {
@@ -685,6 +695,7 @@
                 <div class="total-display">R$ 0,00</div>
                 <button class="delete-product">X</button>
                 <!-- Print-only elements for individual item details -->
+                <span class="print-only print-only-description-qty" style="display:none;"></span>
                 <span class="print-only print-only-quantity" style="display:none;"></span>
                 <span class="print-only print-only-value" style="display:none;"></span>
                 <span class="print-only print-only-percentage" style="display:none;"></span>
@@ -893,6 +904,7 @@
                 <div class="total-display">R$ 0,00</div>
                 <button class="delete-product">X</button>
                 <!-- Print-only elements for individual item details -->
+                <span class="print-only print-only-description-qty" style="display:none;"></span>
                 <span class="print-only print-only-quantity" style="display:none;"></span>
                 <span class="print-only print-only-value" style="display:none;"></span>
                 <span class="print-only print-only-percentage" style="display:none;"></span>
@@ -1066,19 +1078,19 @@
                 // Prepare product items for printing
                 document.querySelectorAll('.product-item').forEach(item => {
                     const quantity = parseFloat(item.querySelector('.quantity-input').value) || 0;
-                    const value = parseFloat(item.querySelector('.value-input').value) || 0;
-                    const percentage = parseFloat(item.querySelector('.percentage-input').value) || 0;
-                    const itemTotalWithIncrease = value * quantity * (1 + percentage / 100);
+                    const description = item.querySelector('.product-description').value;
+                    const itemTotalWithIncrease = parseFloat(item.querySelector('.total-display').textContent.replace('R$ ', '').replace(',', '.')) || 0;
 
-                    // Populate print-only spans
-                    item.querySelector('.print-only-quantity').textContent = `Qtd: ${quantity}`;
-                    // item.querySelector('.print-only-value').textContent = `Valor: R$ ${value.toFixed(2).replace('.', ',')}`; // Ocultado na impressão
-                    // item.querySelector('.print-only-percentage').textContent = `Acr.: ${percentage}%`; // Ocultado na impressão
-                    item.querySelector('.print-only-item-total').textContent = `Total: R$ ${itemTotalWithIncrease.toFixed(2).replace('.', ',')}`;
+                    // Populate the new print-only description + quantity span
+                    const printDescriptionQtySpan = item.querySelector('.print-only-description-qty');
+                    printDescriptionQtySpan.textContent = `${description} (Qtd: ${quantity})`;
 
-                    // Store original description to revert later
-                    const descriptionInput = item.querySelector('.product-description');
-                    descriptionInput.setAttribute('data-original-description', descriptionInput.value);
+                    // Populate the print-only item total span
+                    const printItemTotalSpan = item.querySelector('.print-only-item-total');
+                    printItemTotalSpan.textContent = `R$ ${itemTotalWithIncrease.toFixed(2).replace('.', ',')}`;
+
+                    // Store original description to revert later (though not strictly needed for this approach, good for consistency)
+                    item.querySelector('.product-description').setAttribute('data-original-description', description);
                 });
 
                 // Esconde elementos online e mostra os de impressão
@@ -1106,9 +1118,7 @@
                         descriptionInput.removeAttribute('data-original-description');
                     }
                     // Clear print-only spans
-                    item.querySelector('.print-only-quantity').textContent = '';
-                    item.querySelector('.print-only-value').textContent = '';
-                    item.querySelector('.print-only-percentage').textContent = '';
+                    item.querySelector('.print-only-description-qty').textContent = '';
                     item.querySelector('.print-only-item-total').textContent = '';
                 });
             };
@@ -1299,7 +1309,7 @@
                         <div class="total-display">R$ 0,00</div>
                         <button class="delete-product">X</button>
                         <!-- Print-only elements for individual item details -->
-                        <span class="print-only print-only-quantity" style="display:none;"></span>
+                        <span class="print-only print-only-description-qty" style="display:none;"></span>
                         <span class="print-only print-only-value" style="display:none;"></span>
                         <span class="print-only print-only-percentage" style="display:none;"></span>
                         <span class="print-only print-only-item-total" style="display:none;"></span>
