@@ -1464,13 +1464,24 @@ Pode ser pago com cartão de crédito com juros (a consultar condições).`;
                 let chatHistory = [];
                 chatHistory.push({ role: "user", parts: [{ text: prompt }] });
                 const payload = { contents: chatHistory };
-                const apiKey = ""; // If you want to use models other than gemini-2.0-flash or imagen-3.0-generate-002, provide an API key here. Otherwise, leave this as-is.
+                // A chave da API é fornecida automaticamente pelo ambiente Canvas.
+                // Não adicione sua própria chave de API aqui.
+                const apiKey = "";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Erro na resposta da API Gemini:', response.status, response.statusText, errorData);
+                    generatedTextElement.textContent = `Erro da API: ${errorData.error.message || 'Desconhecido'}. Por favor, tente novamente mais tarde.`;
+                    outputSection.style.display = 'block';
+                    return; // Stop execution here
+                }
+
                 const result = await response.json();
 
                 if (result.candidates && result.candidates.length > 0 &&
@@ -1480,12 +1491,12 @@ Pode ser pago com cartão de crédito com juros (a consultar condições).`;
                     generatedTextElement.textContent = text;
                     outputSection.style.display = 'block';
                 } else {
-                    generatedTextElement.textContent = 'Não foi possível gerar o resumo. Tente novamente.';
+                    generatedTextElement.textContent = 'Não foi possível gerar o resumo. A resposta da API estava vazia ou em formato inesperado.';
                     outputSection.style.display = 'block';
                     console.error('Estrutura de resposta inesperada da API Gemini:', result);
                 }
             } catch (error) {
-                generatedTextElement.textContent = 'Ocorreu um erro ao comunicar com a API. Por favor, tente novamente mais tarde.';
+                generatedTextElement.textContent = 'Ocorreu um erro ao comunicar com a API. Por favor, verifique sua conexão ou tente novamente mais tarde.';
                 outputSection.style.display = 'block';
                 console.error('Erro ao chamar a API Gemini:', error);
             } finally {
