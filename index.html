@@ -544,32 +544,37 @@
             }
             /* Exibe o novo contentor para os detalhes do item na impressão */
             .product-item .print-only-item-details {
-                display: flex !important; /* Use flexbox for internal layout */
-                justify-content: space-between !important;
-                align-items: flex-start !important; /* Align to top for multi-line descriptions */
+                display: block !important; /* Changed to block */
                 width: 100% !important;
                 padding: 0 !important;
                 margin: 0 !important;
+                /* Clearfix for floated elements */
+                content: "";
+                display: table;
+                clear: both;
             }
             .product-item .print-only-description-qty { /* Novo span para descrição + quantidade */
-                display: block !important; /* Block within flex item */
-                flex: 1 !important; /* Takes available space */
+                display: inline-block !important;
+                width: calc(100% - 90px) !important; /* Adjusted width */
+                float: left !important; /* Float left */
                 font-weight: bold !important;
                 font-size: 1em !important;
                 color: #333 !important;
                 margin-right: 10px !important;
                 word-wrap: break-word !important;
                 box-sizing: border-box !important;
+                vertical-align: top !important; /* Align to top if multi-line */
             }
             .product-item .print-only-item-total {
-                display: block !important; /* Block within flex item */
-                flex-shrink: 0 !important; /* Don't shrink */
+                display: inline-block !important;
                 width: 80px !important; /* Fixed width for the total */
+                float: right !important; /* Float right */
                 font-weight: bold !important;
                 font-size: 1em !important;
                 color: #333 !important;
                 text-align: right !important;
                 box-sizing: border-box !important;
+                vertical-align: top !important; /* Align to top */
             }
 
             .summary {
@@ -742,4 +747,823 @@
             <div class="additional-value online-only">
                 <span>acr. Total:</span>
                 <strong>R$ <span id="additional-value">0,00</span></strong>
-            </d
+            </div>
+
+            <!-- Novas linhas para exibir Valor de Entrega e Valor do Desconto online -->
+            <div class="delivery-cost-summary online-only">
+                <span>Valor de Entrega:</span>
+                <strong>R$ <span id="delivery-cost-summary-display">0,00</span></strong>
+            </div>
+            <div class="discount-amount-summary online-only">
+                <span>Valor do Desconto:</span>
+                <strong>R$ <span id="discount-amount-summary-display">0,00</span></strong>
+            </div>
+
+            <!-- Print view elements (hidden online) -->
+            <div class="print-only" id="gross-total-print-info">
+                <span>Total:</span>
+                <strong>R$ <span class="gross-total-display">0,00</span></strong>
+            </div>
+            <div class="print-only" id="discount-amount-print-info">
+                <span>Desconto:</span>
+                <strong>R$ <span class="discount-amount-display">0,00</span></strong>
+            </div>
+
+            <div class="total-pay">
+                <span>TOTAL A PAGAR:</span>
+                <strong>R$ <span id="total-pay">0,00</span></strong>
+            </div>
+        </div>
+
+        <div class="pix-info">
+            <h3 class="online-only">Informações para Pagamento via Pix:</h3>
+            <label class="online-only" for="pix-key-type">Tipo de Chave Pix:</label>
+            <select class="online-only" id="pix-key-type">
+                <option value="">Selecione o tipo</option>
+                <option value="cpf">CPF</option>
+                <option value="cnpj">CNPJ</option>
+                <option value="email">E-mail</option>
+                <option value="phone">Telefone</option>
+                <option value="random">Chave Aleatória</option>
+            </select>
+
+            <label class="online-only" for="pix-key">Chave Pix:</label>
+            <input class="online-only" type="text" id="pix-key" placeholder="Digite a chave Pix">
+
+            <label class="online-only" for="pix-description">Descrição para Identificação:</label>
+            <input class="online-only" type="text" id="pix-description" placeholder="Ex: Nome da Empresa, Recebedor">
+
+            <div class="print-only" id="pix-print-info">
+                <p><strong>Informações para Pagamento via Pix:</strong></p>
+                <p>Tipo de Chave: <span class="pix-key-type-display"></span></p> <!-- Added for printing Pix key type -->
+                <p>Chave Pix: <span class="pix-key-display"></span></p>
+                <p>Identificação: <span class="pix-description-display"></span></p>
+            </div>
+        </div>
+
+        <div class="credit-card-info">
+            <p>Pode ser pago com cartão de crédito com juros (a consultar condições).</p>
+        </div>
+
+        <div class="button-group">
+            <button class="print-button" onclick="printForm()">Imprimir Orçamento</button>
+            <button class="save-button" onclick="saveForm()">Salvar Orçamento</button>
+            <button class="load-button" onclick="loadForm()">Carregar Orçamento</button>
+        </div>
+
+        <div class="whatsapp-support-container">
+            <button class="whatsapp-support-button" onclick="openWhatsAppGroup()">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
+                    <path d="M12.04 2C7.34 2 3.58 5.76 3.58 10.46C3.58 12.11 4.07 13.63 4.93 14.93L3.79 18.21L7.2 17.06C8.36 17.78 9.68 18.17 11.04 18.17H11.08C15.79 18.17 19.55 14.41 19.55 9.71C19.55 5.01 15.79 2 11.04 2ZM16.63 13.06C16.43 1.46 14.99 14.28 14.7 14.39C14.42 14.51 14.2 14.53 13.92 14.16C13.64 13.79 12.67 12.6 12.35 12.18C12.03 11.76 11.76 11.69 11.53 11.77C11.3 11.84 10.23 12.37 9.94 12.69C9.66 13.01 9.4 13.31 9.13 13.34C8.86 13.37 8.61 13.29 8.36 12.92C8.11 12.55 7.42 10.96 7.15 10.42C6.88 9.88 6.94 9.63 7.14 9.42C7.34 9.22 7.6 8.87 7.86 8.61C8.12 8.35 8.38 8.27 8.58 8.01C8.78 7.75 8.97 7.39 9.23 7.07C9.49 6.75 9.76 6.67 9.99 6.69C10.22 6.72 10.49 6.75 10.74 7.3C11 7.85 11.7 8.92 11.77 9.06C11.84 9.2 11.9 9.23 12.13 9.14C12.36 9.05 13.05 8.78 13.8 8.16C14.42 7.65 14.92 7.5 15.11 7.42C15.3 7.34 15.49 7.31 15.72 7.35C15.95 7.39 16.14 7.97 16.36 8.34C16.59 8.71 16.82 9.84 16.57 10.37C16.32 10.9 16.63 13.06 16.63 13.06Z" />
+                </svg>
+                Suporte WhatsApp
+            </button>
+        </div>
+
+        <button class="add-product llm-generate-button" onclick="generateQuotationSummary()">Gerar Resumo/Email ✨</button>
+        <div class="llm-loading-indicator" id="llm-loading-indicator">A gerar resumo...</div>
+        <div class="llm-output-section" id="llm-output-section">
+            <h3>Resumo/Rascunho Gerado:</h3>
+            <pre id="llm-generated-text"></pre>
+            <button class="copy-button" onclick="copyGeneratedText()">Copiar Texto</button>
+        </div>
+    </div>
+
+    <script>
+        let currentLogoSource = 'url'; // Variável para controlar a fonte do logo (url ou file)
+        let deferredPrompt; // Variável para armazenar o evento beforeinstallprompt
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Adiciona listeners para os campos da primeira linha e os campos de entrega/desconto
+            attachProductItemListeners(document.querySelector('.product-item'));
+            document.getElementById('distance').addEventListener('input', updateOverallTotals);
+            document.getElementById('price-per-km').addEventListener('input', updateOverallTotals);
+            document.getElementById('pix-discount-percentage').addEventListener('input', updateOverallTotals);
+            document.getElementById('pix-key-type').addEventListener('input', updateOverallTotals); // Adicionado para atualizar ao mudar o tipo de chave Pix
+
+            // Listeners para os botões de rádio do logo
+            document.getElementById('radio-logo-url').addEventListener('change', toggleLogoInputType);
+            document.getElementById('radio-logo-file').addEventListener('change', toggleLogoInputType);
+
+            // Listeners para os inputs de logo
+            document.getElementById('logo-url-input').addEventListener('input', updateLogoDisplay);
+            document.getElementById('logo-file-input').addEventListener('change', updateLogoDisplay);
+
+            updateOverallTotals(); // Cálculo inicial
+            loadForm(); // Tenta carregar dados salvos, incluindo o logo
+            registerServiceWorker(); // Registra o Service Worker para PWA
+
+            // PWA - Listener para o evento beforeinstallprompt
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Previne que o mini-infobar apareça automaticamente
+                e.preventDefault();
+                // Armazena o evento para que possa ser acionado mais tarde.
+                deferredPrompt = e;
+                // Mostra o botão de instalação
+                const installButton = document.getElementById('install-app-button');
+                if (installButton) {
+                    installButton.style.display = 'block';
+                }
+            });
+
+            // PWA - Listener para o clique no botão de instalação
+            const installButton = document.getElementById('install-app-button');
+            if (installButton) {
+                installButton.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        // Esconde o botão de instalação
+                        installButton.style.display = 'none';
+                        // Mostra o prompt de instalação
+                        deferredPrompt.prompt();
+                        // Espera pela resposta do utilizador ao prompt
+                        const { outcome } = await deferredPrompt.userChoice;
+                        // Opcional: Log o resultado da escolha do utilizador
+                        console.log(`User response to the A2HS prompt: ${outcome}`);
+                        // Limpa o evento armazenado, pois só pode ser usado uma vez.
+                        deferredPrompt = null;
+                    }
+                });
+            }
+        });
+
+        function attachProductItemListeners(itemElement) {
+            itemElement.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', calculateProductTotalAndOverallTotals);
+            });
+            itemElement.querySelector('.delete-product').addEventListener('click', deleteProduct);
+        }
+
+        function addProduct() {
+            const productList = document.getElementById('product-list');
+            const newItem = document.createElement('div');
+            newItem.classList.add('product-item');
+            newItem.innerHTML = `
+                <input type="text" class="product-description" placeholder="Descrição do Produto">
+                <div class="input-group">
+                    <label>Qtd:</label>
+                    <input type="number" class="quantity-input" value="1" min="1">
+                </div>
+                <div class="input-group">
+                    <label>Valor (R$):</label>
+                    <input type="number" class="value-input" placeholder="0.00" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>acr. (%):</label>
+                    <input type="number" class="percentage-input" value="0" min="0">
+                </div>
+                <div class="total-display">R$ 0,00</div>
+                <button class="delete-product">X</button>
+                <!-- Print-only container for individual item details -->
+                <div class="print-only-item-details" style="display:none;">
+                    <span class="print-only-description-qty"></span>
+                    <span class="print-only-item-total"></span>
+                </div>
+            `;
+            productList.appendChild(newItem);
+
+            attachProductItemListeners(newItem); // Anexa listeners ao novo item
+            updateOverallTotals();
+        }
+
+        function deleteProduct(event) {
+            const productItem = event.target.closest('.product-item');
+            if (productItem) {
+                productItem.remove();
+                updateOverallTotals();
+            }
+        }
+
+        function calculateProductTotalAndOverallTotals(event) {
+            const input = event.target;
+            const productItem = input.closest('.product-item');
+
+            const quantityInput = productItem.querySelector('.quantity-input');
+            const valueInput = productItem.querySelector('.value-input');
+            const percentageInput = productItem.querySelector('.percentage-input');
+            const totalDisplay = productItem.querySelector('.total-display');
+
+            let quantity = parseFloat(quantityInput.value) || 0;
+            let value = parseFloat(valueInput.value) || 0;
+            let percentage = parseFloat(percentageInput.value) || 0;
+
+            if (quantity < 0) quantity = 0;
+            if (value < 0) value = 0;
+            if (percentage < 0) percentage = 0;
+
+            const itemSubtotal = value * quantity;
+            const itemTotalWithIncrease = itemSubtotal * (1 + percentage / 100);
+
+            totalDisplay.textContent = `R$ ${itemTotalWithIncrease.toFixed(2).replace('.', ',')}`;
+            updateOverallTotals();
+        }
+
+        function updateOverallTotals() {
+            let subtotalProducts = 0;
+            let totalProductsWithIncrease = 0;
+            let totalAdditionalValue = 0;
+
+            document.querySelectorAll('.product-item').forEach(item => {
+                const quantity = parseFloat(item.querySelector('.quantity-input').value) || 0;
+                const value = parseFloat(item.querySelector('.value-input').value) || 0;
+                const percentage = parseFloat(item.querySelector('.percentage-input').value) || 0;
+
+                const itemSubtotal = value * quantity;
+                const itemTotalWithIncrease = itemSubtotal * (1 + percentage / 100);
+                const itemAdditionalValue = itemTotalWithIncrease - itemSubtotal;
+
+                subtotalProducts += itemSubtotal;
+                totalProductsWithIncrease += itemTotalWithIncrease;
+                totalAdditionalValue += itemAdditionalValue;
+            });
+
+            let deliveryCost = 0;
+            const distance = parseFloat(document.getElementById('distance').value) || 0;
+            const pricePerKm = parseFloat(document.getElementById('price-per-km').value) || 0;
+
+            if (!isNaN(distance) && !isNaN(pricePerKm)) {
+                deliveryCost = distance * pricePerKm;
+            }
+            if (deliveryCost < 0) deliveryCost = 0;
+
+
+            let pixDiscountPercentage = parseFloat(document.getElementById('pix-discount-percentage').value) || 0;
+            if (pixDiscountPercentage < 0) pixDiscountPercentage = 0;
+            if (pixDiscountPercentage > 100) pixDiscountPercentage = 100;
+
+            const totalBeforeDiscount = totalProductsWithIncrease + deliveryCost;
+            const discountAmount = totalBeforeDiscount * (pixDiscountPercentage / 100); // Calcula o valor do desconto
+            const totalPay = totalBeforeDiscount - discountAmount;
+
+            document.getElementById('subtotal').textContent = subtotalProducts.toFixed(2).replace('.', ',');
+            document.getElementById('additional-value').textContent = totalAdditionalValue.toFixed(2).replace('.', ',');
+            document.getElementById('delivery-cost-summary-display').textContent = deliveryCost.toFixed(2).replace('.', ','); // Atualiza o valor de entrega online
+            document.getElementById('discount-amount-summary-display').textContent = discountAmount.toFixed(2).replace('.', ','); // Atualiza o valor do desconto online
+            document.getElementById('total-pay').textContent = totalPay.toFixed(2).replace('.', ',');
+        }
+
+        function toggleLogoInputType() {
+            const urlFields = document.getElementById('logo-url-fields');
+            const fileFields = document.getElementById('logo-file-fields');
+            const radioUrl = document.getElementById('radio-logo-url');
+
+            if (radioUrl.checked) {
+                urlFields.style.display = 'block';
+                fileFields.style.display = 'none';
+                currentLogoSource = 'url';
+            } else {
+                urlFields.style.display = 'none';
+                fileFields.style.display = 'block';
+                currentLogoSource = 'file';
+            }
+            updateLogoDisplay(); // Atualiza a exibição do logo após a troca
+        }
+
+        function updateLogoDisplay() {
+            const companyLogoImg = document.getElementById('company-logo');
+            companyLogoImg.style.display = 'none'; // Esconde a imagem por padrão
+
+            // Remove o onerror handler anterior para evitar duplicação ou conflitos
+            companyLogoImg.onerror = null;
+
+            if (currentLogoSource === 'url') {
+                const logoUrlInput = document.getElementById('logo-url-input');
+                const url = logoUrlInput.value;
+                if (url) {
+                    companyLogoImg.src = url;
+                    companyLogoImg.style.display = 'block';
+                    companyLogoImg.onerror = () => {
+                        companyLogoImg.style.display = 'none';
+                        companyLogoImg.src = '';
+                        console.error('Erro ao carregar o logo da URL fornecida: ' + url);
+                    };
+                } else {
+                    companyLogoImg.src = '';
+                }
+            } else if (currentLogoSource === 'file') {
+                const logoFileInput = document.getElementById('logo-file-input');
+                const file = logoFileInput.files[0];
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        companyLogoImg.src = e.target.result;
+                        companyLogoImg.style.display = 'block';
+                    };
+                    reader.onerror = () => {
+                        companyLogoImg.style.display = 'none';
+                        companyLogoImg.src = '';
+                        console.error('Erro ao ler o arquivo de logo local.');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    companyLogoImg.src = '';
+                }
+            }
+        }
+
+        function printForm() {
+            const companyNameInput = document.getElementById('company-name');
+            const companyNameDisplay = document.querySelector('.print-only-company-name');
+            
+            // Set company name for printing
+            if (companyNameInput.value) {
+                companyNameDisplay.textContent = companyNameInput.value;
+                companyNameDisplay.style.display = 'block';
+            } else {
+                companyNameDisplay.style.display = 'none';
+            }
+
+            // Prepara o logo para impressão
+            const companyLogoImgPrint = document.createElement('img');
+            const tempLogoContainer = document.createElement('div');
+            tempLogoContainer.classList.add('print-only-logo');
+            tempLogoContainer.style.textAlign = 'center';
+            // Set initial styles for the print logo
+            companyLogoImgPrint.style.maxWidth = '150px';
+            companyLogoImgPrint.style.maxHeight = '80px';
+            companyLogoImgPrint.style.margin = '0 auto 15px auto';
+            companyLogoImgPrint.style.display = 'block'; // Ensure it's block for centering
+            tempLogoContainer.appendChild(companyLogoImgPrint);
+
+            const logoUrlInput = document.getElementById('logo-url-input');
+            const logoFileInput = document.getElementById('logo-file-input');
+
+            // Function to finalize the print process after logo is handled
+            const finalizePrint = () => {
+                // Prepare product items for printing
+                document.querySelectorAll('.product-item').forEach(item => {
+                    const quantity = parseFloat(item.querySelector('.quantity-input').value) || 0;
+                    const description = item.querySelector('.product-description').value;
+                    const itemTotalWithIncrease = parseFloat(item.querySelector('.total-display').textContent.replace('R$ ', '').replace(',', '.')) || 0;
+
+                    // Populate the new print-only description + quantity span
+                    const printDescriptionQtySpan = item.querySelector('.print-only-description-qty');
+                    printDescriptionQtySpan.textContent = `${description} (Qtd: ${quantity})`;
+
+                    // Populate the print-only item total span
+                    const printItemTotalSpan = item.querySelector('.print-only-item-total');
+                    printItemTotalSpan.textContent = `R$ ${itemTotalWithIncrease.toFixed(2).replace('.', ',')}`;
+
+                    // Show the print-only container for each item
+                    item.querySelector('.print-only-item-details').style.display = 'block'; // Changed to block
+                });
+
+                // Hide online-only elements
+                document.querySelectorAll('.online-only').forEach(el => el.style.display = 'none');
+
+                // Show specific print-only sections
+                document.getElementById('delivery-print-info').style.display = 'block';
+                document.getElementById('discount-print-info').style.display = 'block';
+                document.getElementById('pix-print-info').style.display = 'block';
+                document.getElementById('gross-total-print-info').style.display = 'flex'; 
+                document.getElementById('discount-amount-print-info').style.display = 'flex'; 
+
+                window.print();
+
+                // Revert changes after printing
+                document.querySelectorAll('.online-only').forEach(el => el.style.display = 'block');
+                document.querySelectorAll('.print-only-item-details').forEach(itemDetails => itemDetails.style.display = 'none'); // Hide product item details
+                document.getElementById('delivery-print-info').style.display = 'none';
+                document.getElementById('discount-print-info').style.display = 'none';
+                document.getElementById('pix-print-info').style.display = 'none';
+                document.getElementById('gross-total-print-info').style.display = 'none';
+                document.getElementById('discount-amount-print-info').style.display = 'none';
+                
+                // Clear and hide company name display for print after printing
+                companyNameDisplay.textContent = '';
+                companyNameDisplay.style.display = 'none';
+
+                if (tempLogoContainer) { // Remove o logo temporário após a impressão
+                    tempLogoContainer.remove();
+                }
+
+                // Restore original descriptions (not strictly needed with new structure but good practice)
+                document.querySelectorAll('.product-item').forEach(item => {
+                    const descriptionInput = item.querySelector('.product-description');
+                    const originalDescription = descriptionInput.getAttribute('data-original-description');
+                    if (originalDescription) {
+                        descriptionInput.value = originalDescription;
+                        descriptionInput.removeAttribute('data-original-description');
+                    }
+                    // Clear print-only spans (already hidden by parent div, but good for cleanliness)
+                    item.querySelector('.print-only-description-qty').textContent = '';
+                    item.querySelector('.print-only-item-total').textContent = '';
+                });
+            };
+
+            // Handle logo loading based on currentLogoSource
+            if (currentLogoSource === 'url' && logoUrlInput.value) {
+                companyLogoImgPrint.src = logoUrlInput.value;
+                companyLogoImgPrint.alt = "Logo da Empresa";
+                // Append the container immediately, but finalizePrint will wait for onload
+                document.body.prepend(tempLogoContainer); 
+                companyLogoImgPrint.onload = finalizePrint;
+                companyLogoImgPrint.onerror = () => {
+                    console.error('Erro ao carregar o logo da URL para impressão: ' + logoUrlInput.value);
+                    finalizePrint(); // Proceed even if logo fails to load
+                };
+            } else if (currentLogoSource === 'file' && logoFileInput.files.length > 0) {
+                const file = logoFileInput.files[0];
+                const reader = new FileReader();
+
+                reader.onloadend = () => {
+                    companyLogoImgPrint.src = reader.result;
+                    companyLogoImgPrint.alt = "Logo da Empresa";
+                    document.body.prepend(tempLogoContainer); // Add container when file is read
+                    finalizePrint();
+                };
+                reader.onerror = () => {
+                    console.error('Erro ao ler o arquivo de logo local para impressão.');
+                    finalizePrint(); // Proceed even if logo fails to load
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // No logo selected or invalid source, proceed directly
+                finalizePrint();
+            }
+
+            // Prepare Pix info for printing (moved outside logo loading logic)
+            const pixKeyTypeSelect = document.getElementById('pix-key-type');
+            const pixKeyTypeText = pixKeyTypeSelect.options[pixKeyTypeSelect.selectedIndex].text; // Get selected text
+            const pixKey = document.getElementById('pix-key').value;
+            const pixDescription = document.getElementById('pix-description').value;
+
+            const pixPrintInfo = document.getElementById('pix-print-info');
+            if (pixKey || pixDescription || pixKeyTypeText !== 'Selecione o tipo') { // Check if any Pix info is present
+                pixPrintInfo.querySelector('.pix-key-type-display').textContent = pixKeyTypeText; // Set Pix key type
+                pixPrintInfo.querySelector('.pix-key-display').textContent = pixKey;
+                pixPrintInfo.querySelector('.pix-description-display').textContent = pixDescription;
+                // pixPrintInfo.style.display is handled by the explicit show/hide in finalizePrint
+            } else {
+                // If no Pix info, ensure it's hidden for print
+                pixPrintInfo.style.display = 'none';
+            }
+
+            // Prepare delivery info for printing (moved outside logo loading logic)
+            const distance = parseFloat(document.getElementById('distance').value) || 0;
+            const pricePerKm = parseFloat(document.getElementById('price-per-km').value) || 0;
+            let deliveryCost = 0;
+            if (!isNaN(distance) && !isNaN(pricePerKm)) {
+                deliveryCost = distance * pricePerKm;
+            }
+            const deliveryPrintInfo = document.getElementById('delivery-print-info');
+            if (deliveryCost > 0) {
+                deliveryPrintInfo.querySelector('.delivery-cost-display').textContent = deliveryCost.toFixed(2).replace('.', ',');
+                // deliveryPrintInfo.style.display is handled by the explicit show/hide in finalizePrint
+            } else {
+                deliveryPrintInfo.style.display = 'none';
+            }
+
+            // Prepare discount info for printing (moved outside logo loading logic)
+            const pixDiscountPercentage = parseFloat(document.getElementById('pix-discount-percentage').value) || 0;
+            const discountPrintInfo = document.getElementById('discount-print-info');
+            if (pixDiscountPercentage > 0) {
+                discountPrintInfo.querySelector('.discount-percentage-display').textContent = `${pixDiscountPercentage.toFixed(1).replace('.', ',')}%`;
+                // discountPrintInfo.style.display is handled by the explicit show/hide in finalizePrint
+            } else {
+                discountPrintInfo.style.display = 'none';
+            }
+
+            // Calculate and display gross total, discount amount, and total to pay for printing
+            let subtotalProducts = 0;
+            let totalProductsWithIncrease = 0;
+
+            document.querySelectorAll('.product-item').forEach(item => {
+                const quantity = parseFloat(item.querySelector('.quantity-input').value) || 0;
+                const value = parseFloat(item.querySelector('.value-input').value) || 0;
+                const percentage = parseFloat(item.querySelector('.percentage-input').value) || 0;
+
+                const itemSubtotal = value * quantity;
+                const itemTotalWithIncrease = itemSubtotal * (1 + percentage / 100);
+
+                subtotalProducts += itemSubtotal;
+                totalProductsWithIncrease += itemTotalWithIncrease;
+            });
+
+            const totalBeforeDiscount = totalProductsWithIncrease + deliveryCost;
+            const discountAmount = totalBeforeDiscount * (pixDiscountPercentage / 100);
+            const totalPay = totalBeforeDiscount - discountAmount;
+
+            document.getElementById('gross-total-print-info').querySelector('.gross-total-display').textContent = totalBeforeDiscount.toFixed(2).replace('.', ',');
+            document.getElementById('discount-amount-print-info').querySelector('.discount-amount-display').textContent = discountAmount.toFixed(2).replace('.', ',');
+            document.getElementById('total-pay').textContent = totalPay.toFixed(2).replace('.', ',');
+        }
+
+
+        function saveForm() {
+            const products = [];
+            document.querySelectorAll('.product-item').forEach(item => {
+                products.push({
+                    description: item.querySelector('.product-description').value,
+                    quantity: item.querySelector('.quantity-input').value,
+                    value: item.querySelector('.value-input').value,
+                    percentage: item.querySelector('.percentage-input').value
+                });
+            });
+
+            const formData = {
+                companyName: document.getElementById('company-name').value,
+                logoUrl: document.getElementById('logo-url-input').value, // Salva o URL do logo (apenas URL, não arquivo local)
+                lastLogoSource: currentLogoSource, // Salva qual tipo de input de logo estava selecionado
+                // Note: File data from logo-file-input cannot be directly saved to localStorage for security/size reasons.
+                products: products,
+                distance: document.getElementById('distance').value,
+                pricePerKm: document.getElementById('price-per-km').value,
+                pixDiscountPercentage: document.getElementById('pix-discount-percentage').value,
+                pixKeyType: document.getElementById('pix-key-type').value,
+                pixKey: document.getElementById('pix-key').value,
+                pixDescription: document.getElementById('pix-description').value
+            };
+
+            localStorage.setItem('budgetForm', JSON.stringify(formData));
+            alert('Orçamento salvo com sucesso!');
+        }
+
+        function loadForm() {
+            const savedData = localStorage.getItem('budgetForm');
+            if (savedData) {
+                const formData = JSON.parse(savedData);
+
+                // Carrega o nome da empresa
+                document.getElementById('company-name').value = formData.companyName || '';
+
+                // Carrega o URL do logo e o tipo de input de logo selecionado
+                document.getElementById('logo-url-input').value = formData.logoUrl || '';
+                currentLogoSource = formData.lastLogoSource || 'url'; // Define a fonte do logo
+
+                // Seleciona o radio button correto e atualiza a exibição
+                if (currentLogoSource === 'file') {
+                    document.getElementById('radio-logo-file').checked = true;
+                } else {
+                    document.getElementById('radio-logo-url').checked = true;
+                }
+                toggleLogoInputType(); // Chama para exibir o campo correto e o logo (se URL)
+
+                // Limpa os produtos atuais
+                const productList = document.getElementById('product-list');
+                productList.innerHTML = '';
+
+                // Carrega os produtos
+                formData.products.forEach(product => {
+                    const newItem = document.createElement('div');
+                    newItem.classList.add('product-item');
+                    newItem.innerHTML = `
+                        <input type="text" class="product-description" placeholder="Descrição do Produto" value="${product.description || ''}">
+                        <div class="input-group">
+                            <label>Qtd:</label>
+                            <input type="number" class="quantity-input" value="${product.quantity || '1'}" min="1">
+                        </div>
+                        <div class="input-group">
+                            <label>Valor (R$):</label>
+                            <input type="number" class="value-input" placeholder="0.00" step="0.01" value="${product.value || ''}">
+                        </div>
+                        <div class="input-group">
+                            <label>acr. (%):</label>
+                            <input type="number" class="percentage-input" value="${product.percentage || '0'}" min="0">
+                        </div>
+                        <div class="total-display">R$ 0,00</div>
+                        <button class="delete-product">X</button>
+                        <!-- Print-only container for individual item details -->
+                        <div class="print-only-item-details" style="display:none;">
+                            <span class="print-only-description-qty"></span>
+                            <span class="print-only-item-total"></span>
+                        </div>
+                    `;
+                    productList.appendChild(newItem);
+                    attachProductItemListeners(newItem); // Anexa listeners aos novos itens carregados
+                });
+
+                // Carrega outros campos
+                document.getElementById('distance').value = formData.distance || '';
+                document.getElementById('pricePerKm').value = formData.pricePerKm || '';
+                document.getElementById('pix-discount-percentage').value = formData.pixDiscountPercentage || '';
+                document.getElementById('pix-key-type').value = formData.pixKeyType || '';
+                document.getElementById('pix-key').value = formData.pixKey || '';
+                document.getElementById('pix-description').value = formData.pixDescription || '';
+
+                // Recalcula todos os totais após carregar
+                updateOverallTotals();
+                document.querySelectorAll('.product-item').forEach(item => {
+                    const event = new Event('input');
+                    item.querySelector('.value-input').dispatchEvent(event); // Dispara para atualizar os totais de cada linha
+                });
+
+                alert('Orçamento carregado com sucesso!');
+            } else {
+                alert('Nenhum orçamento salvo encontrado.');
+            }
+        }
+
+        // Função para iniciar um novo orçamento (limpar todos os campos)
+        function newBudget() {
+            // Limpa o nome da empresa
+            document.getElementById('company-name').value = '';
+
+            // Limpa o logo
+            document.getElementById('radio-logo-url').checked = true; // Volta para URL como padrão
+            document.getElementById('logo-url-input').value = '';
+            document.getElementById('logo-file-input').value = ''; // Limpa o arquivo selecionado
+            toggleLogoInputType(); // Atualiza a exibição do logo
+
+            // Remove todos os itens de produto, exceto o primeiro (se houver)
+            const productList = document.getElementById('product-list');
+            while (productList.children.length > 1) {
+                productList.removeChild(productList.lastChild);
+            }
+            // Reseta o primeiro item
+            const firstProductItem = productList.querySelector('.product-item');
+            if (firstProductItem) {
+                firstProductItem.querySelector('.product-description').value = '';
+                firstProductItem.querySelector('.quantity-input').value = '1';
+                firstProductItem.querySelector('.value-input').value = '';
+                firstProductItem.querySelector('.percentage-input').value = '0'; // Reset to 0
+                firstProductItem.querySelector('.total-display').textContent = 'R$ 0,00';
+                firstProductItem.querySelector('.print-only-item-details').style.display = 'none'; // Hide print-only details
+                firstProductItem.querySelector('.print-only-description-qty').textContent = '';
+                firstProductItem.querySelector('.print-only-item-total').textContent = '';
+            }
+
+            // Limpa informações de entrega
+            document.getElementById('distance').value = '';
+            document.getElementById('price-per-km').value = '';
+
+            // Limpa informações de desconto
+            document.getElementById('pix-discount-percentage').value = '';
+
+            // Limpa informações Pix
+            document.getElementById('pix-key-type').value = '';
+            document.getElementById('pix-key').value = '';
+            document.getElementById('pix-description').value = '';
+
+            // Recalcula todos os totais para zerar o resumo
+            updateOverallTotals();
+
+            // Esconde a seção de saída do LLM
+            document.getElementById('llm-output-section').style.display = 'none';
+            document.getElementById('llm-generated-text').textContent = '';
+
+
+            alert('Novo orçamento iniciado!');
+        }
+
+        // Função para recarregar/atualizar os valores (recalcular totais)
+        function reloadValues() {
+            updateOverallTotals(); // Recalcula todos os totais
+            updateLogoDisplay(); // Garante que o logo está atualizado (especialmente se a URL foi alterada)
+            alert('Valores atualizados!');
+        }
+
+        // Função para abrir o grupo de WhatsApp
+        function openWhatsAppGroup() {
+            // Substitua 'SEU_LINK_DO_GRUPO' pelo link real do seu grupo de WhatsApp
+            const whatsappLink = 'https://chat.whatsapp.com/ESoTBlLX4DJ5nCubjTMzD1';
+            window.open(whatsappLink, '_blank');
+        }
+
+        // Função para gerar resumo/email usando a API Gemini
+        async function generateQuotationSummary() {
+            const loadingIndicator = document.getElementById('llm-loading-indicator');
+            const outputSection = document.getElementById('llm-output-section');
+            const generatedTextElement = document.getElementById('llm-generated-text');
+
+            loadingIndicator.style.display = 'block';
+            outputSection.style.display = 'none';
+            generatedTextElement.textContent = '';
+
+            const companyName = document.getElementById('company-name').value;
+            const products = [];
+            document.querySelectorAll('.product-item').forEach(item => {
+                products.push({
+                    description: item.querySelector('.product-description').value,
+                    quantity: parseFloat(item.querySelector('.quantity-input').value) || 0,
+                    value: parseFloat(item.querySelector('.value-input').value) || 0,
+                    percentage: parseFloat(item.querySelector('.percentage-input').value) || 0,
+                    totalItem: parseFloat(item.querySelector('.total-display').textContent.replace('R$ ', '').replace(',', '.')) || 0
+                });
+            });
+
+            const subtotalProducts = document.getElementById('subtotal').textContent.replace(',', '.');
+            const totalAdditionalValue = document.getElementById('additional-value').textContent.replace(',', '.'); // This value is still calculated but not used in prompt
+            const deliveryCost = document.getElementById('delivery-cost-summary-display').textContent.replace(',', '.');
+            const pixDiscountPercentage = document.getElementById('pix-discount-percentage').value;
+            const discountAmount = document.getElementById('discount-amount-summary-display').textContent.replace(',', '.');
+            const totalPay = document.getElementById('total-pay').textContent.replace(',', '.');
+            const pixKeyType = document.getElementById('pix-key-type').options[document.getElementById('pix-key-type').selectedIndex].text;
+            const pixKey = document.getElementById('pix-key').value;
+            const pixDescription = document.getElementById('pix-description').value;
+
+            // Adjusted products list text to exclude percentage for the summary
+            let productsListText = products.map(p =>
+                `- ${p.description} (Qtd: ${p.quantity}) - Valor Unitário: R$ ${p.value.toFixed(2).replace('.', ',')} - Total do item: R$ ${p.totalItem.toFixed(2).replace('.', ',')}`
+            ).join('\n');
+
+            let prompt = `Crie um rascunho de e-mail profissional e formal, ou um resumo detalhado de um orçamento, com base nas seguintes informações. O texto deve ser claro, conciso e incluir todos os detalhes relevantes, bem como as informações de pagamento Pix. Comece com uma saudação e termine com uma despedida profissional.
+
+Nome da Empresa: ${companyName || 'Não informado'}
+
+Detalhes dos Produtos:
+${productsListText || 'Nenhum produto adicionado.'}
+
+Resumo Financeiro:
+Subtotal dos Itens: R$ ${subtotalProducts}
+Valor de Entrega: R$ ${deliveryCost}
+Desconto Pix: ${pixDiscountPercentage}% (Valor do Desconto: R$ ${discountAmount})
+TOTAL A PAGAR: R$ ${totalPay}
+
+Informações para Pagamento via Pix:
+Tipo de Chave: ${pixKeyType || 'Não informado'}
+Chave Pix: ${pixKey || 'Não informada'}
+Descrição para Identificação: ${pixDescription || 'Não informada'}
+
+Considerações Adicionais:
+Pode ser pago com cartão de crédito com juros (a consultar condições).`;
+
+            try {
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                // ATENÇÃO: Insira a sua chave de API do Google AI Studio/Google Cloud aqui.
+                // Exemplo: const apiKey = "SUA_CHAVE_DE_API_AQUI";
+                // Se continuar a receber o erro "unregistered callers", insira a sua chave de API aqui.
+                const apiKey = "AIzaSyCDgG_gwJZDaLM_1Ttr491nHfawZNZ5pM4"; // <--- COLOQUE A SUA CHAVE DE API AQUI DENTRO DAS ASPAS
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Erro na resposta da API Gemini:', response.status, response.statusText, errorData);
+                    generatedTextElement.textContent = `Erro da API: ${errorData.error.message || 'Desconhecido'}. Por favor, tente novamente mais tarde.`;
+                    outputSection.style.display = 'block';
+                    return; // Stop execution here
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    generatedTextElement.textContent = text;
+                    outputSection.style.display = 'block';
+                } else {
+                    generatedTextElement.textContent = 'Não foi possível gerar o resumo. A resposta da API estava vazia ou em formato inesperado.';
+                    outputSection.style.display = 'block';
+                    console.error('Estrutura de resposta inesperada da API Gemini:', result);
+                }
+            } catch (error) {
+                generatedTextElement.textContent = 'Ocorreu um erro ao comunicar com a API. Por favor, verifique sua conexão ou tente novamente mais tarde.';
+                outputSection.style.display = 'block';
+                console.error('Erro ao chamar a API Gemini:', error);
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        }
+
+        // Função para copiar o texto gerado para a área de transferência
+        function copyGeneratedText() {
+            const generatedTextElement = document.getElementById('llm-generated-text');
+            const textToCopy = generatedTextElement.textContent;
+
+            // Usa document.execCommand('copy') como fallback para ambientes restritos (iFrame)
+            const textArea = document.createElement("textarea");
+            textArea.value = textToCopy;
+            textArea.style.position = "fixed"; // Evita scroll
+            textArea.style.opacity = "0"; // Torna invisível
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                const msg = successful ? 'Texto copiado com sucesso!' : 'Falha ao copiar o texto.';
+                alert(msg);
+            } catch (err) {
+                console.error('Erro ao copiar texto: ', err);
+                alert('Não foi possível copiar o texto automaticamente. Por favor, selecione e copie manualmente.');
+            } finally {
+                document.body.removeChild(textArea);
+            }
+        }
+
+
+        // PWA - Registro do Service Worker
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('service-worker.js')
+                        .then(registration => {
+                            console.log('ServiceWorker registado com sucesso:', registration.scope);
+                        })
+                        .catch(error => {
+                            console.log('Falha no registo do ServiceWorker:', error);
+                        });
+                });
+            }
+        }
+    </script>
+</body>
+</html>
