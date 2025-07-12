@@ -1464,9 +1464,10 @@ Pode ser pago com cartão de crédito com juros (a consultar condições).`;
                 let chatHistory = [];
                 chatHistory.push({ role: "user", parts: [{ text: prompt }] });
                 const payload = { contents: chatHistory };
-                // A chave da API é fornecida automaticamente pelo ambiente Canvas.
-                // Não adicione sua própria chave de API aqui.
-                const apiKey = "";
+                // ATENÇÃO: Insira a sua chave de API do Google AI Studio/Google Cloud aqui.
+                // Exemplo: const apiKey = "SUA_CHAVE_DE_API_AQUI";
+                // Se continuar a receber o erro "unregistered callers", insira a sua chave de API aqui.
+                const apiKey = "AIzaSyCDgG_gwJZDaLM_1Ttr491nHfawZNZ5pM4"; // <--- COLOQUE A SUA CHAVE DE API AQUI DENTRO DAS ASPAS
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
                 const response = await fetch(apiUrl, {
                     method: 'POST',
