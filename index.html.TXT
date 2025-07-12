@@ -640,8 +640,8 @@
         <h1>FORMULÁRIO DE ORÇAMENTO SIMPLES</h1>
 
         <div class="company-info">
-            <label for="company-name">Nome da Empresa / CNPJ / Contato :</label>
-            <input type="text" id="company-name" placeholder="Digite o nome ou CNPJ da empresa">
+            <label for="company-name">Nome da Empresa / CNPJ / Contato:</label>
+            <input type="text" id="company-name" placeholder="Digite o nome, CNPJ e o contato da empresa">
             <div class="print-only-company-name" style="display:none;"></div>
         </div>
 
@@ -1053,9 +1053,10 @@
         }
 
         function printForm() {
-            // Prepara informações da empresa para impressão
             const companyNameInput = document.getElementById('company-name');
             const companyNameDisplay = document.querySelector('.print-only-company-name');
+            
+            // Set company name for printing
             if (companyNameInput.value) {
                 companyNameDisplay.textContent = companyNameInput.value;
                 companyNameDisplay.style.display = 'block';
@@ -1105,6 +1106,11 @@
                 // Reverte as mudanças após a impressão (importante para a visualização online)
                 printOnlyElements.forEach(el => el.style.display = 'none');
                 onlineOnlyElements.forEach(el => el.style.display = 'block');
+                
+                // Clear and hide company name display for print after printing
+                companyNameDisplay.textContent = '';
+                companyNameDisplay.style.display = 'none';
+
                 if (tempLogoContainer) { // Remove o logo temporário após a impressão
                     tempLogoContainer.remove();
                 }
@@ -1434,6 +1440,7 @@
             const pixKey = document.getElementById('pix-key').value;
             const pixDescription = document.getElementById('pix-description').value;
 
+            // Adjusted products list text to exclude percentage for the summary
             let productsListText = products.map(p =>
                 `- ${p.description} (Qtd: ${p.quantity}) - Valor Unitário: R$ ${p.value.toFixed(2).replace('.', ',')} - Total do item: R$ ${p.totalItem.toFixed(2).replace('.', ',')}`
             ).join('\n');
