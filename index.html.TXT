@@ -126,8 +126,7 @@
             position: relative;
             overflow-x: hidden; /* Remove explicitamente o scroll horizontal */
         }
-        .product-item input[type="text"],
-        .product-item input[type="number"] {
+        .product-item input[type="text"] {
             padding: 10px;
             border: 1px solid #dcdcdc; /* Borda mais clara */
             border-radius: 8px; /* Cantos mais arredondados */
@@ -137,7 +136,7 @@
         }
         .product-item .product-description {
             flex: 1; /* Permite crescer e ocupar o espaço restante */
-            min-width: 150px; /* Garante largura mínima para a descrição */
+            min-width: 55%; /* Garante largura mínima para a descrição */
         }
         .product-item .total-display {
             flex: 0 0 60px; /* Largura base ajustada para ser menor */
@@ -165,7 +164,7 @@
         .product-item div.input-group {
             display: flex;
             flex-direction: column;
-            flex: 0 0 60px; /* Largura base para Qtd, Valor, Acréscimo (45px) */
+            flex: 0 0 10%; /* Largura base para Qtd, Valor, Acréscimo (45px) */
             align-items: center; /* Centraliza o input dentro do group */
         }
         .product-item input[type="number"] {
@@ -324,7 +323,7 @@
             box-sizing: border-box;
             text-align: center;
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            min-width: 140px; /* Garante que os botões não fiquem muito pequenos */
+            min-width: 20%; /* Garante que os botões não fiquem muito pequenos */
         }
         .new-budget-button {
             background-color: #dc3545; /* Vermelho para "Novo Orçamento" */
@@ -395,6 +394,61 @@
             fill: white; /* Cor do ícone */
         }
 
+        /* LLM Generated Content */
+        .llm-output-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e9f7ef; /* Fundo verde claro */
+            border: 1px solid #c3e6cb; /* Borda verde */
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            display: none; /* Hidden by default */
+        }
+        .llm-output-section h3 {
+            text-align: center;
+            color: #28a745; /* Verde mais escuro */
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        .llm-output-section pre {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            white-space: pre-wrap; /* Quebra de linha para texto longo */
+            word-wrap: break-word; /* Quebra de palavra para texto longo */
+            font-family: 'Inter', Arial, sans-serif;
+            font-size: 0.9em;
+            color: #333;
+            max-height: 300px; /* Limita a altura para scroll */
+            overflow-y: auto;
+        }
+        .llm-output-section .copy-button {
+            background-color: #007BFF;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 10px;
+            display: block;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            transition: background-color 0.3s ease;
+        }
+        .llm-output-section .copy-button:hover {
+            background-color: #0056b3;
+        }
+        .llm-loading-indicator {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            font-style: italic;
+            color: #666;
+        }
+
 
         /* Estilos para impressão */
         @media print {
@@ -429,6 +483,15 @@
                 font-weight: bold;
                 margin-bottom: 10px;
             }
+            /* Ensure logo is visible */
+            .print-only-logo {
+                display: block !important;
+                margin-bottom: 15px; /* Add some space below the logo */
+            }
+            .print-only-logo img {
+                display: block !important;
+            }
+
             .logo-input-group, /* Oculta todo o grupo de input de logo online */
             .logo-input-group .radio-options,
             .logo-input-group .logo-input-fields {
@@ -437,9 +500,11 @@
             .top-buttons-group, /* Oculta os novos botões na impressão */
             #install-app-button, /* Oculta o botão de instalação na impressão */
             .whatsapp-support-container, /* Oculta o botão de WhatsApp na impressão */
-            .product-item input[type="number"],
-            .product-item .value-input,
-            .product-item .percentage-input,
+            .llm-output-section, /* Oculta a seção de saída do LLM na impressão */
+            .product-item input[type="text"], /* Hide description input */
+            .product-item input[type="number"], /* Hide number inputs */
+            .product-item .value-input, /* Explicitly hide value input */
+            .product-item .percentage-input, /* Explicitly hide percentage input */
             .add-product,
             .summary .subtotal,
             .summary .additional-value,
@@ -457,26 +522,38 @@
                 display: none !important;
             }
             .product-item {
-                display: block; /* Volta para bloco para que a descrição ocupe a linha toda */
-                margin-bottom: 8px;
-                padding: 0;
-                border: none;
-                background: none;
+                display: block; /* Cada item toma a largura total */
+                border-bottom: 1px dashed #eee; /* Separador para itens */
+                padding-bottom: 5px;
+                margin-bottom: 10px;
+                position: relative; /* Para posicionar o total à direita */
             }
             .product-item .product-description {
-                width: 100%; /* Ocupa a largura total na impressão */
-                border: none;
-                background: none;
-                padding: 0;
-                font-size: 1em;
-                display: block !important; /* Garante que a descrição seja visível */
+                width: calc(100% - 100px); /* Ajusta largura para o total impresso */
+                font-weight: bold;
+                margin-bottom: 5px;
+                display: inline-block !important; /* Para ficar na mesma linha que os outros detalhes */
+                vertical-align: top; /* Alinha ao topo se o texto for longo */
             }
-            .product-item .total-display {
-                display: none !important; /* Oculta o total-display original na impressão */
+            .product-item .print-only-quantity {
+                display: inline-block !important; /* Exibe inline para layout compacto */
+                margin-right: 8px; /* Espaçamento entre os valores */
+                font-size: 0.9em;
+                color: #333;
+                white-space: nowrap; /* Evita quebra de linha */
             }
-            .product-item .quantity-display { /* Este não existe no HTML, mas é um exemplo se fosse necessário */
+            .product-item .print-only-value, /* Oculta explicitamente o valor unitário na impressão */
+            .product-item .print-only-percentage { /* Oculta explicitamente o acréscimo percentual na impressão */
                 display: none !important;
             }
+            .product-item .print-only-item-total {
+                display: inline-block !important;
+                font-weight: bold;
+                float: right; /* Alinha o total à direita */
+                font-size: 1em;
+                color: #333;
+            }
+
             .summary {
                 border-top: 1px dashed #ccc;
                 padding-top: 10px;
@@ -492,10 +569,11 @@
                 border-top: 1px solid #000;
                 padding-top: 10px;
             }
-            .pix-info, .delivery-section, .discount-section {
+            .pix-info, .delivery-section, .discount-section, .credit-card-info {
                 display: block !important;
                 background-color: #fff;
-                border: none;
+                border: none !important; /* Remove borda na impressão */
+                box-shadow: none !important; /* Remove sombra na impressão */
                 padding: 0;
                 margin-top: 15px;
             }
@@ -540,7 +618,7 @@
             .button-group, .top-buttons-group {
                 flex-direction: column;
             }
-            .print-button, .save-button, .load-button, .new-budget-button, .reload-values-button, #install-app-button, .whatsapp-support-button {
+            .print-button, .save-button, .load-button, .new-budget-button, .reload-values-button, #install-app-button, .whatsapp-support-button, .llm-generate-button {
                 width: 100%;
                 margin-bottom: 10px;
             }
@@ -602,10 +680,15 @@
                 </div>
                 <div class="input-group">
                     <label>acr. (%):</label>
-                    <input type="number" class="percentage-input" value="20" min="0">
+                    <input type="number" class="percentage-input" value="0" min="0"> <!-- Changed default to 0 -->
                 </div>
                 <div class="total-display">R$ 0,00</div>
                 <button class="delete-product">X</button>
+                <!-- Print-only elements for individual item details -->
+                <span class="print-only print-only-quantity" style="display:none;"></span>
+                <span class="print-only print-only-value" style="display:none;"></span>
+                <span class="print-only print-only-percentage" style="display:none;"></span>
+                <span class="print-only print-only-item-total" style="display:none;"></span>
             </div>
         </div>
 
@@ -715,6 +798,14 @@
                 Suporte WhatsApp
             </button>
         </div>
+
+        <button class="add-product llm-generate-button" onclick="generateQuotationSummary()">Gerar Resumo/Email ✨</button>
+        <div class="llm-loading-indicator" id="llm-loading-indicator">A gerar resumo...</div>
+        <div class="llm-output-section" id="llm-output-section">
+            <h3>Resumo/Rascunho Gerado:</h3>
+            <pre id="llm-generated-text"></pre>
+            <button class="copy-button" onclick="copyGeneratedText()">Copiar Texto</button>
+        </div>
     </div>
 
     <script>
@@ -797,10 +888,15 @@
                 </div>
                 <div class="input-group">
                     <label>acr. (%):</label>
-                    <input type="number" class="percentage-input" value="20" min="0">
+                    <input type="number" class="percentage-input" value="0" min="0">
                 </div>
                 <div class="total-display">R$ 0,00</div>
                 <button class="delete-product">X</button>
+                <!-- Print-only elements for individual item details -->
+                <span class="print-only print-only-quantity" style="display:none;"></span>
+                <span class="print-only print-only-value" style="display:none;"></span>
+                <span class="print-only print-only-percentage" style="display:none;"></span>
+                <span class="print-only print-only-item-total" style="display:none;"></span>
             `;
             productList.appendChild(newItem);
 
@@ -967,19 +1063,22 @@
 
             // Function to finalize the print process after logo is handled
             const finalizePrint = () => {
-                // Modifica a descrição para impressão (agora incluindo a quantidade novamente)
+                // Prepare product items for printing
                 document.querySelectorAll('.product-item').forEach(item => {
-                    const quantity = item.querySelector('.quantity-input').value; // Pega a quantidade
+                    const quantity = parseFloat(item.querySelector('.quantity-input').value) || 0;
+                    const value = parseFloat(item.querySelector('.value-input').value) || 0;
+                    const percentage = parseFloat(item.querySelector('.percentage-input').value) || 0;
+                    const itemTotalWithIncrease = value * quantity * (1 + percentage / 100);
+
+                    // Populate print-only spans
+                    item.querySelector('.print-only-quantity').textContent = `Qtd: ${quantity}`;
+                    // item.querySelector('.print-only-value').textContent = `Valor: R$ ${value.toFixed(2).replace('.', ',')}`; // Ocultado na impressão
+                    // item.querySelector('.print-only-percentage').textContent = `Acr.: ${percentage}%`; // Ocultado na impressão
+                    item.querySelector('.print-only-item-total').textContent = `Total: R$ ${itemTotalWithIncrease.toFixed(2).replace('.', ',')}`;
+
+                    // Store original description to revert later
                     const descriptionInput = item.querySelector('.product-description');
-                    const totalDisplay = item.querySelector('.total-display');
-
-                    const originalDescription = descriptionInput.value;
-                    const totalValue = totalDisplay.textContent;
-
-                    descriptionInput.setAttribute('data-original-description', originalDescription);
-                    // Retorna ao formato: Descrição (Qtd) - Total
-                    descriptionInput.value = `${originalDescription} (${quantity}x) - ${totalValue}`;
-                    item.classList.add('print-mode'); // Adiciona classe para estilos de impressão
+                    descriptionInput.setAttribute('data-original-description', descriptionInput.value);
                 });
 
                 // Esconde elementos online e mostra os de impressão
@@ -1006,7 +1105,11 @@
                         descriptionInput.value = originalDescription;
                         descriptionInput.removeAttribute('data-original-description');
                     }
-                    item.classList.remove('print-mode');
+                    // Clear print-only spans
+                    item.querySelector('.print-only-quantity').textContent = '';
+                    item.querySelector('.print-only-value').textContent = '';
+                    item.querySelector('.print-only-percentage').textContent = '';
+                    item.querySelector('.print-only-item-total').textContent = '';
                 });
             };
 
@@ -1191,10 +1294,15 @@
                         </div>
                         <div class="input-group">
                             <label>acr. (%):</label>
-                            <input type="number" class="percentage-input" value="${product.percentage || '20'}" min="0">
+                            <input type="number" class="percentage-input" value="${product.percentage || '0'}" min="0">
                         </div>
                         <div class="total-display">R$ 0,00</div>
                         <button class="delete-product">X</button>
+                        <!-- Print-only elements for individual item details -->
+                        <span class="print-only print-only-quantity" style="display:none;"></span>
+                        <span class="print-only print-only-value" style="display:none;"></span>
+                        <span class="print-only print-only-percentage" style="display:none;"></span>
+                        <span class="print-only print-only-item-total" style="display:none;"></span>
                     `;
                     productList.appendChild(newItem);
                     attachProductItemListeners(newItem); // Anexa listeners aos novos itens carregados
@@ -1243,7 +1351,7 @@
                 firstProductItem.querySelector('.product-description').value = '';
                 firstProductItem.querySelector('.quantity-input').value = '1';
                 firstProductItem.querySelector('.value-input').value = '';
-                firstProductItem.querySelector('.percentage-input').value = '20';
+                firstProductItem.querySelector('.percentage-input').value = '0'; // Reset to 0
                 firstProductItem.querySelector('.total-display').textContent = 'R$ 0,00';
             }
 
@@ -1262,6 +1370,11 @@
             // Recalcula todos os totais para zerar o resumo
             updateOverallTotals();
 
+            // Esconde a seção de saída do LLM
+            document.getElementById('llm-output-section').style.display = 'none';
+            document.getElementById('llm-generated-text').textContent = '';
+
+
             alert('Novo orçamento iniciado!');
         }
 
@@ -1277,6 +1390,123 @@
             // Substitua 'SEU_LINK_DO_GRUPO' pelo link real do seu grupo de WhatsApp
             const whatsappLink = 'https://chat.whatsapp.com/ESoTBlLX4DJ5nCubjTMzD1';
             window.open(whatsappLink, '_blank');
+        }
+
+        // Função para gerar resumo/email usando a API Gemini
+        async function generateQuotationSummary() {
+            const loadingIndicator = document.getElementById('llm-loading-indicator');
+            const outputSection = document.getElementById('llm-output-section');
+            const generatedTextElement = document.getElementById('llm-generated-text');
+
+            loadingIndicator.style.display = 'block';
+            outputSection.style.display = 'none';
+            generatedTextElement.textContent = '';
+
+            const companyName = document.getElementById('company-name').value;
+            const products = [];
+            document.querySelectorAll('.product-item').forEach(item => {
+                products.push({
+                    description: item.querySelector('.product-description').value,
+                    quantity: parseFloat(item.querySelector('.quantity-input').value) || 0,
+                    value: parseFloat(item.querySelector('.value-input').value) || 0,
+                    percentage: parseFloat(item.querySelector('.percentage-input').value) || 0,
+                    totalItem: parseFloat(item.querySelector('.total-display').textContent.replace('R$ ', '').replace(',', '.')) || 0
+                });
+            });
+
+            const subtotalProducts = document.getElementById('subtotal').textContent.replace(',', '.');
+            const totalAdditionalValue = document.getElementById('additional-value').textContent.replace(',', '.');
+            const deliveryCost = document.getElementById('delivery-cost-summary-display').textContent.replace(',', '.');
+            const pixDiscountPercentage = document.getElementById('pix-discount-percentage').value;
+            const discountAmount = document.getElementById('discount-amount-summary-display').textContent.replace(',', '.');
+            const totalPay = document.getElementById('total-pay').textContent.replace(',', '.');
+            const pixKeyType = document.getElementById('pix-key-type').options[document.getElementById('pix-key-type').selectedIndex].text;
+            const pixKey = document.getElementById('pix-key').value;
+            const pixDescription = document.getElementById('pix-description').value;
+
+            let productsListText = products.map(p =>
+                `- ${p.description} (Qtd: ${p.quantity}) - Valor Unitário: R$ ${p.value.toFixed(2).replace('.', ',')} - Acréscimo: ${p.percentage}% - Total do item: R$ ${p.totalItem.toFixed(2).replace('.', ',')}`
+            ).join('\n');
+
+            let prompt = `Crie um rascunho de e-mail profissional e formal, ou um resumo detalhado de um orçamento, com base nas seguintes informações. O texto deve ser claro, conciso e incluir todos os detalhes relevantes, bem como as informações de pagamento Pix. Comece com uma saudação e termine com uma despedida profissional.
+
+Nome da Empresa: ${companyName || 'Não informado'}
+
+Detalhes dos Produtos:
+${productsListText || 'Nenhum produto adicionado.'}
+
+Resumo Financeiro:
+Subtotal dos Itens: R$ ${subtotalProducts}
+Acréscimo Total dos Itens: R$ ${totalAdditionalValue}
+Valor de Entrega: R$ ${deliveryCost}
+Desconto Pix: ${pixDiscountPercentage}% (Valor do Desconto: R$ ${discountAmount})
+TOTAL A PAGAR: R$ ${totalPay}
+
+Informações para Pagamento via Pix:
+Tipo de Chave: ${pixKeyType || 'Não informado'}
+Chave Pix: ${pixKey || 'Não informada'}
+Descrição para Identificação: ${pixDescription || 'Não informada'}
+
+Considerações Adicionais:
+Pode ser pago com cartão de crédito com juros (a consultar condições).`;
+
+            try {
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // If you want to use models other than gemini-2.0-flash or imagen-3.0-generate-002, provide an API key here. Otherwise, leave this as-is.
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    generatedTextElement.textContent = text;
+                    outputSection.style.display = 'block';
+                } else {
+                    generatedTextElement.textContent = 'Não foi possível gerar o resumo. Tente novamente.';
+                    outputSection.style.display = 'block';
+                    console.error('Estrutura de resposta inesperada da API Gemini:', result);
+                }
+            } catch (error) {
+                generatedTextElement.textContent = 'Ocorreu um erro ao comunicar com a API. Por favor, tente novamente mais tarde.';
+                outputSection.style.display = 'block';
+                console.error('Erro ao chamar a API Gemini:', error);
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        }
+
+        // Função para copiar o texto gerado para a área de transferência
+        function copyGeneratedText() {
+            const generatedTextElement = document.getElementById('llm-generated-text');
+            const textToCopy = generatedTextElement.textContent;
+
+            // Usa document.execCommand('copy') como fallback para ambientes restritos (iFrame)
+            const textArea = document.createElement("textarea");
+            textArea.value = textToCopy;
+            textArea.style.position = "fixed"; // Evita scroll
+            textArea.style.opacity = "0"; // Torna invisível
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                const msg = successful ? 'Texto copiado com sucesso!' : 'Falha ao copiar o texto.';
+                alert(msg);
+            } catch (err) {
+                console.error('Erro ao copiar texto: ', err);
+                alert('Não foi possível copiar o texto automaticamente. Por favor, selecione e copie manualmente.');
+            } finally {
+                document.body.removeChild(textArea);
+            }
         }
 
 
