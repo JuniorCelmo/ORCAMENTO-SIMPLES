@@ -640,7 +640,7 @@
         <h1>FORMULÁRIO DE ORÇAMENTO SIMPLES</h1>
 
         <div class="company-info">
-            <label for="company-name">Nome da Empresa / CNPJ:</label>
+            <label for="company-name">Nome da Empresa / CNPJ / Contato :</label>
             <input type="text" id="company-name" placeholder="Digite o nome ou CNPJ da empresa">
             <div class="print-only-company-name" style="display:none;"></div>
         </div>
@@ -1425,7 +1425,7 @@
             });
 
             const subtotalProducts = document.getElementById('subtotal').textContent.replace(',', '.');
-            const totalAdditionalValue = document.getElementById('additional-value').textContent.replace(',', '.');
+            const totalAdditionalValue = document.getElementById('additional-value').textContent.replace(',', '.'); // This value is still calculated but not used in prompt
             const deliveryCost = document.getElementById('delivery-cost-summary-display').textContent.replace(',', '.');
             const pixDiscountPercentage = document.getElementById('pix-discount-percentage').value;
             const discountAmount = document.getElementById('discount-amount-summary-display').textContent.replace(',', '.');
@@ -1435,7 +1435,7 @@
             const pixDescription = document.getElementById('pix-description').value;
 
             let productsListText = products.map(p =>
-                `- ${p.description} (Qtd: ${p.quantity}) - Valor Unitário: R$ ${p.value.toFixed(2).replace('.', ',')} - Acréscimo: ${p.percentage}% - Total do item: R$ ${p.totalItem.toFixed(2).replace('.', ',')}`
+                `- ${p.description} (Qtd: ${p.quantity}) - Valor Unitário: R$ ${p.value.toFixed(2).replace('.', ',')} - Total do item: R$ ${p.totalItem.toFixed(2).replace('.', ',')}`
             ).join('\n');
 
             let prompt = `Crie um rascunho de e-mail profissional e formal, ou um resumo detalhado de um orçamento, com base nas seguintes informações. O texto deve ser claro, conciso e incluir todos os detalhes relevantes, bem como as informações de pagamento Pix. Comece com uma saudação e termine com uma despedida profissional.
@@ -1447,7 +1447,6 @@ ${productsListText || 'Nenhum produto adicionado.'}
 
 Resumo Financeiro:
 Subtotal dos Itens: R$ ${subtotalProducts}
-Acréscimo Total dos Itens: R$ ${totalAdditionalValue}
 Valor de Entrega: R$ ${deliveryCost}
 Desconto Pix: ${pixDiscountPercentage}% (Valor do Desconto: R$ ${discountAmount})
 TOTAL A PAGAR: R$ ${totalPay}
