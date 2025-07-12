@@ -504,10 +504,6 @@
             #install-app-button, /* Oculta o botão de instalação na impressão */
             .whatsapp-support-container, /* Oculta o botão de WhatsApp na impressão */
             .llm-output-section, /* Oculta a seção de saída do LLM na impressão */
-            .product-item input[type="text"], /* Hide description input */
-            .product-item input[type="number"], /* Hide number inputs */
-            .product-item .value-input, /* Explicitly hide value input */
-            .product-item .percentage-input, /* Explicitly hide percentage input */
             .add-product,
             .summary .subtotal,
             .summary .additional-value,
@@ -518,13 +514,18 @@
             .discount-section .online-only,
             .button-group,
             .credit-card-info,
-            .delete-product,
-            .product-item label, /* Oculta todas as labels dos itens de produto */
-            .product-item div.input-group, /* Oculta os grupos de input (Qtd, Valor, Acr.) */
-            .product-item .total-display /* Oculta o total-display online */
+            .delete-product
             {
                 display: none !important;
             }
+
+            /* Oculta os inputs e os grupos de input de cada item na impressão */
+            .product-item input,
+            .product-item .input-group,
+            .product-item .total-display {
+                display: none !important;
+            }
+
             .product-item {
                 display: flex; /* Use flexbox para alinhar descrição e total */
                 justify-content: space-between;
@@ -537,11 +538,14 @@
                 border: none !important; /* Remove borders */
                 box-shadow: none !important; /* Remove shadows */
             }
-            .product-item .product-description {
-                display: none !important; /* Oculta o input de descrição original */
+            /* Exibe o novo contentor para os detalhes do item na impressão */
+            .product-item .print-only-item-details {
+                display: flex !important; /* Usa flexbox para os elementos de impressão */
+                justify-content: space-between;
+                width: 100%; /* Ocupa a largura total do item */
             }
             .product-item .print-only-description-qty { /* Novo span para descrição + quantidade */
-                display: inline-block !important; /* Exibe o novo span */
+                display: block !important; /* Exibe o novo span como bloco dentro do flex */
                 flex: 1; /* Permite que ocupe espaço */
                 font-weight: bold;
                 font-size: 1em;
@@ -549,13 +553,8 @@
                 margin-right: 10px; /* Espaço entre descrição e total */
                 word-wrap: break-word; /* Quebra de palavra para texto longo */
             }
-            .product-item .print-only-quantity, /* Estes são agora redundantes e devem ser ocultados */
-            .product-item .print-only-value,
-            .product-item .print-only-percentage {
-                display: none !important;
-            }
             .product-item .print-only-item-total {
-                display: inline-block !important;
+                display: block !important; /* Exibe como bloco dentro do flex */
                 font-weight: bold;
                 font-size: 1em;
                 color: #333;
@@ -638,7 +637,7 @@
 <body>
     <div class="container">
         <h1>FORMULÁRIO DE ORÇAMENTO SIMPLES</h1>
-<div class="top-buttons-group">
+        <div class="top-buttons-group">
             <button class="new-budget-button" onclick="newBudget()">Novo Orçamento</button>
             <button class="reload-values-button" onclick="reloadValues()">Recarregar Valores</button>
         </div>
@@ -673,8 +672,6 @@
             </div>
         </div>
 
-        
-
         <button id="install-app-button">Adicionar à Tela Inicial</button>
 
         <div id="product-list">
@@ -694,12 +691,11 @@
                 </div>
                 <div class="total-display">R$ 0,00</div>
                 <button class="delete-product">X</button>
-                <!-- Print-only elements for individual item details -->
-                <span class="print-only print-only-description-qty" style="display:none;"></span>
-                <span class="print-only print-only-quantity" style="display:none;"></span>
-                <span class="print-only print-only-value" style="display:none;"></span>
-                <span class="print-only print-only-percentage" style="display:none;"></span>
-                <span class="print-only print-only-item-total" style="display:none;"></span>
+                <!-- Print-only container for individual item details -->
+                <div class="print-only-item-details" style="display:none;">
+                    <span class="print-only-description-qty"></span>
+                    <span class="print-only-item-total"></span>
+                </div>
             </div>
         </div>
 
@@ -804,7 +800,7 @@
         <div class="whatsapp-support-container">
             <button class="whatsapp-support-button" onclick="openWhatsAppGroup()">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
-                    <path d="M12.04 2C7.34 2 3.58 5.76 3.58 10.46C3.58 12.11 4.07 13.63 4.93 14.93L3.79 18.21L7.2 17.06C8.36 17.78 9.68 18.17 11.04 18.17H11.08C15.79 18.17 19.55 14.41 19.55 9.71C19.55 5.01 15.79 2 11.04 2ZM16.63 13.06C16.43 13.46 14.99 14.28 14.7 14.39C14.42 14.51 14.2 14.53 13.92 14.16C13.64 13.79 12.67 12.6 12.35 12.18C12.03 11.76 11.76 11.69 11.53 11.77C11.3 11.84 10.23 12.37 9.94 12.69C9.66 13.01 9.4 13.31 9.13 13.34C8.86 13.37 8.61 13.29 8.36 12.92C8.11 12.55 7.42 10.96 7.15 10.42C6.88 9.88 6.94 9.63 7.14 9.42C7.34 9.22 7.6 8.87 7.86 8.61C8.12 8.35 8.38 8.27 8.58 8.01C8.78 7.75 8.97 7.39 9.23 7.07C9.49 6.75 9.76 6.67 9.99 6.69C10.22 6.72 10.49 6.75 10.74 7.3C11 7.85 11.7 8.92 11.77 9.06C11.84 9.2 11.9 9.23 12.13 9.14C12.36 9.05 13.05 8.78 13.8 8.16C14.42 7.65 14.92 7.5 15.11 7.42C15.3 7.34 15.49 7.31 15.72 7.35C15.95 7.39 16.14 7.97 16.36 8.34C16.59 8.71 16.82 9.84 16.57 10.37C16.32 10.9 16.63 13.06 16.63 13.06Z" />
+                    <path d="M12.04 2C7.34 2 3.58 5.76 3.58 10.46C3.58 12.11 4.07 13.63 4.93 14.93L3.79 18.21L7.2 17.06C8.36 17.78 9.68 18.17 11.04 18.17H11.08C15.79 18.17 19.55 14.41 19.55 9.71C19.55 5.01 15.79 2 11.04 2ZM16.63 13.06C16.43 1.46 14.99 14.28 14.7 14.39C14.42 14.51 14.2 14.53 13.92 14.16C13.64 13.79 12.67 12.6 12.35 12.18C12.03 11.76 11.76 11.69 11.53 11.77C11.3 11.84 10.23 12.37 9.94 12.69C9.66 13.01 9.4 13.31 9.13 13.34C8.86 13.37 8.61 13.29 8.36 12.92C8.11 12.55 7.42 10.96 7.15 10.42C6.88 9.88 6.94 9.63 7.14 9.42C7.34 9.22 7.6 8.87 7.86 8.61C8.12 8.35 8.38 8.27 8.58 8.01C8.78 7.75 8.97 7.39 9.23 7.07C9.49 6.75 9.76 6.67 9.99 6.69C10.22 6.72 10.49 6.75 10.74 7.3C11 7.85 11.7 8.92 11.77 9.06C11.84 9.2 11.9 9.23 12.13 9.14C12.36 9.05 13.05 8.78 13.8 8.16C14.42 7.65 14.92 7.5 15.11 7.42C15.3 7.34 15.49 7.31 15.72 7.35C15.95 7.39 16.14 7.97 16.36 8.34C16.59 8.71 16.82 9.84 16.57 10.37C16.32 10.9 16.63 13.06 16.63 13.06Z" />
                 </svg>
                 Suporte WhatsApp
             </button>
@@ -903,12 +899,11 @@
                 </div>
                 <div class="total-display">R$ 0,00</div>
                 <button class="delete-product">X</button>
-                <!-- Print-only elements for individual item details -->
-                <span class="print-only print-only-description-qty" style="display:none;"></span>
-                <span class="print-only print-only-quantity" style="display:none;"></span>
-                <span class="print-only print-only-value" style="display:none;"></span>
-                <span class="print-only print-only-percentage" style="display:none;"></span>
-                <span class="print-only print-only-item-total" style="display:none;"></span>
+                <!-- Print-only container for individual item details -->
+                <div class="print-only-item-details" style="display:none;">
+                    <span class="print-only-description-qty"></span>
+                    <span class="print-only-item-total"></span>
+                </div>
             `;
             productList.appendChild(newItem);
 
@@ -1090,8 +1085,8 @@
                     const printItemTotalSpan = item.querySelector('.print-only-item-total');
                     printItemTotalSpan.textContent = `R$ ${itemTotalWithIncrease.toFixed(2).replace('.', ',')}`;
 
-                    // Store original description to revert later (though not strictly needed for this approach, good for consistency)
-                    item.querySelector('.product-description').setAttribute('data-original-description', description);
+                    // Show the print-only container for each item
+                    item.querySelector('.print-only-item-details').style.display = 'flex';
                 });
 
                 // Esconde elementos online e mostra os de impressão
@@ -1115,7 +1110,12 @@
                     tempLogoContainer.remove();
                 }
 
-                // Restaura as descrições originais e remove a classe de print
+                // Hide the print-only container for each item after printing
+                document.querySelectorAll('.product-item').forEach(item => {
+                    item.querySelector('.print-only-item-details').style.display = 'none';
+                });
+
+                // Restaura as descrições originais e remove a classe de print (not strictly needed with new structure but good practice)
                 document.querySelectorAll('.product-item').forEach(item => {
                     const descriptionInput = item.querySelector('.product-description');
                     const originalDescription = descriptionInput.getAttribute('data-original-description');
@@ -1123,7 +1123,7 @@
                         descriptionInput.value = originalDescription;
                         descriptionInput.removeAttribute('data-original-description');
                     }
-                    // Clear print-only spans
+                    // Clear print-only spans (already hidden by parent div, but good for cleanliness)
                     item.querySelector('.print-only-description-qty').textContent = '';
                     item.querySelector('.print-only-item-total').textContent = '';
                 });
@@ -1314,11 +1314,11 @@
                         </div>
                         <div class="total-display">R$ 0,00</div>
                         <button class="delete-product">X</button>
-                        <!-- Print-only elements for individual item details -->
-                        <span class="print-only print-only-description-qty" style="display:none;"></span>
-                        <span class="print-only print-only-value" style="display:none;"></span>
-                        <span class="print-only print-only-percentage" style="display:none;"></span>
-                        <span class="print-only print-only-item-total" style="display:none;"></span>
+                        <!-- Print-only container for individual item details -->
+                        <div class="print-only-item-details" style="display:none;">
+                            <span class="print-only-description-qty"></span>
+                            <span class="print-only-item-total"></span>
+                        </div>
                     `;
                     productList.appendChild(newItem);
                     attachProductItemListeners(newItem); // Anexa listeners aos novos itens carregados
@@ -1369,6 +1369,9 @@
                 firstProductItem.querySelector('.value-input').value = '';
                 firstProductItem.querySelector('.percentage-input').value = '0'; // Reset to 0
                 firstProductItem.querySelector('.total-display').textContent = 'R$ 0,00';
+                firstProductItem.querySelector('.print-only-item-details').style.display = 'none'; // Hide print-only details
+                firstProductItem.querySelector('.print-only-description-qty').textContent = '';
+                firstProductItem.querySelector('.print-only-item-total').textContent = '';
             }
 
             // Limpa informações de entrega
