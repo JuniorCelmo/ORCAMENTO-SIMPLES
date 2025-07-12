@@ -638,7 +638,10 @@
 <body>
     <div class="container">
         <h1>FORMULÁRIO DE ORÇAMENTO SIMPLES</h1>
-
+<div class="top-buttons-group">
+            <button class="new-budget-button" onclick="newBudget()">Novo Orçamento</button>
+            <button class="reload-values-button" onclick="reloadValues()">Recarregar Valores</button>
+        </div>
         <div class="company-info">
             <label for="company-name">Nome da Empresa / CNPJ / Contato:</label>
             <input type="text" id="company-name" placeholder="Digite o nome, CNPJ e o contato da empresa">
@@ -670,10 +673,7 @@
             </div>
         </div>
 
-        <div class="top-buttons-group">
-            <button class="new-budget-button" onclick="newBudget()">Novo Orçamento</button>
-            <button class="reload-values-button" onclick="reloadValues()">Recarregar Valores</button>
-        </div>
+        
 
         <button id="install-app-button">Adicionar à Tela Inicial</button>
 
